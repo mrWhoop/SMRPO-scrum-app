@@ -16,6 +16,11 @@ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO scrum_admin;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO scrum_admin;
 GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO scrum_admin;
 ```
-Install python 3.7
-*python -m pip install Django
-*pip install psycopg2 (adapter/driver for DB communication)
+Install python 3.7 (using virtual enviroment is recomended)
+
+* python -m pip install Django
+* pip install psycopg2 (adapter/driver for DB communication)
+
+Run server to see if it all works:
+* cd scrum
+* python manage.py runserver
