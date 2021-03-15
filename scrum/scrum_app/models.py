@@ -1,28 +1,30 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class Project(models.Model):
 
+    projectName = models.TextField
+
     # lastnik projekta
-    product_owner = models.TextField
+    product_owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # skrbnik metodologije
-    scrum_master = models.TextField
+    scrum_master = models.ForeignKey(User, on_delete=models.CASCADE)
 
 # dev team member without any special role
 class DevTeamMember(models.Model):
 
-    userId = models.IntegerField() # for now, waiting on user management stuff
+    userId = models.ForeignKey(User, on_delete=models.CASCADE)
 
     projectId = models.ForeignKey(Project, on_delete=models.CASCADE)
 
 class Sprint(models.Model):
 
-    start = models.DateTimeField()
+    start = models.DateTimeField
 
-    end = models.DateTimeField()
+    end = models.DateTimeField
 
-    expectedSpeed = models.IntegerField()
+    expectedSpeed = models.IntegerField
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
@@ -42,11 +44,11 @@ class Story(models.Model):
 
     timeSpent = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
-    assignedUser = models.IntegerField
+    assignedUser = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     userConfirmed = models.BooleanField(default=False)
 
-    comment = models.TextField
+    comment = models.TextField(null=True)
 
     # 'new', 'in progress', 'done', 'accepted', 'rejected', 'incomlete'
     developmentStatus = models.TextField
