@@ -1,15 +1,28 @@
-{% block new_story_form %}
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 
-<form>
-	<label for="story_name">Name:</label>
-	<input type="text" name="story_name">
+<form class="">
+	<div class="mb-3">
+		<label class="form-label" for="story_name">Name:</label>
+		<input class="form-control" type="text" name="story_name">
+	</div>
+
+	<label for="story_description">Description:</label>
 	<input type="text" name="story_description">
+
+	<label for="story_priority">Priority:</label>
 	<select name="stoy_priority">
 		<option value="must_have">Must have</option>
 		<option value="should_have">Should have</option>
 		<option value="could_have">Could have</option>
 		<option value="wont_have">Won't have</option>
 	</select>
+
+	<label for="story_bussines_value">Bussines value:</label>
+	<input type="text" name="story_bussines_value">
+
+
 </form>
 
 {% endblock %}
