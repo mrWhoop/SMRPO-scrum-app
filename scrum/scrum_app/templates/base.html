@@ -22,10 +22,34 @@
 		<h1 class="align-middle">SCRUM App</h1>
 	</header>
 
-	
+	<div class="container-fluid h-100">
 
-{% block content %}
-{% endblock %}
+		<div class="row">
+
+			<nav class="col-2 h-100">
+				<ul class="nav flex-column">
+				 	<li class="nav-item">
+				    	<a class="nav-link active" href="#">Home</a>
+				  	</li>
+				  	<li class="nav-item">
+				    	<a class="nav-link" href="#">New story</a>
+				  	</li>
+				  	<li class="nav-item">
+				    	<a class="nav-link" href="#">TODO</a>
+				  	</li>
+				  	<li class="nav-item">
+				    	<a class="nav-link" href="#">TODO</a>
+				  	</li>
+				</ul>
+			</nav>
+
+			<div class="col-10 main_container">
+				{% block content %}
+				{% endblock %}
+			</div>
+
+		</div>
+	</div>
 
 </body>
 </html>

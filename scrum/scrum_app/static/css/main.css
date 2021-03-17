@@ -9,3 +9,17 @@ header h1 {
 	font-size: 21pt;
 	line-height: 100px;
 }
+
+nav {
+	background-color: #4F8EC3;
+	height: 100%;
+	padding-top: 25px;
+}
+
+nav ul li a {
+	color: #fff;
+}
+
+.main_container {
+	padding: 25px;
+}
