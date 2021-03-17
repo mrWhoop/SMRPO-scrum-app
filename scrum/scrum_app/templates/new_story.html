@@ -1,0 +1,15 @@
+{% block new_story_form %}
+
+<form>
+	<label for="story_name">Name:</label>
+	<input type="text" name="story_name">
+	<input type="text" name="story_description">
+	<select name="stoy_priority">
+		<option value="must_have">Must have</option>
+		<option value="should_have">Should have</option>
+		<option value="could_have">Could have</option>
+		<option value="wont_have">Won't have</option>
+	</select>
+</form>
+
+{% endblock %}

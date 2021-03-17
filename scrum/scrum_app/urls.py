@@ -8,4 +8,5 @@ from scrum_app import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^new_story/$', views.new_story_form, name='new_story_form'),
 ]
