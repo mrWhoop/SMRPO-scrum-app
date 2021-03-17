@@ -6,10 +6,10 @@ class Project(models.Model):
     projectName = models.TextField
 
     # lastnik projekta
-    product_owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    product_owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product_owner')
 
     # skrbnik metodologije
-    scrum_master = models.ForeignKey(User, on_delete=models.CASCADE)
+    scrum_master = models.ForeignKey(User, on_delete=models.CASCADE, related_name='scrum_master')
 
 # dev team member without any special role
 class DevTeamMember(models.Model):
