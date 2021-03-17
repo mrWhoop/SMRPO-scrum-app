@@ -1,13 +1,13 @@
 header {
 	width: 100%;
-	height: 100px;
+	height: 10vh;
 	background-color: #98BF5B;
 }
 
 header h1 {
 	margin: 0 0 0 30px;
 	font-size: 21pt;
-	line-height: 100px;
+	line-height: 10vh;
 }
 
 nav {
@@ -22,4 +22,9 @@ nav ul li a {
 
 .main_container {
 	padding: 25px;
+	overflow: scroll;
+}
+
+.nav_main_container {
+	height: 90vh;
 }
