@@ -9,10 +9,10 @@ def index(request):
 
     text = 'Hello World!'
 
-    return render(request, 'home.html', context={'text': text, 'string': 'string' })
+    return render(request, 'home.html', context={'text': text, 'string': 'string', 'activate_home':'active'})
 
 def new_story_form(request):
-    return render(request, 'new_story.html', context={})
+    return render(request, 'new_story.html', context={'activate_newstory':'active'})
 
 def login_user(request):
     if request.method == 'POST':
