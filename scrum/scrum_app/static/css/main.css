@@ -28,3 +28,41 @@ nav ul li a {
 .nav_main_container {
 	height: 90vh;
 }
+
+/* Right-aligned section inside the top navigation */
+.topnav-right {
+	float: right;
+  }
+
+.topnav {
+	overflow: hidden;
+	width: 100%;
+	height: 10vh;
+	background-color: #98BF5B;
+}
+
+.topnav a {
+	float: left;
+	padding: 0 16px;
+	text-decoration: none;
+	font-size: 17px;
+	margin-top: 30px;
+  position: relative;
+  
+}
+
+.topnav .login-data {
+	float: left;
+	padding: 0 16px;
+	margin-top: 30px;
+	text-decoration: none;
+	
+}
+
+.topnav h1 {
+	float: left;
+	margin: 30px;
+	font-size: 21pt;
+	
+}
+

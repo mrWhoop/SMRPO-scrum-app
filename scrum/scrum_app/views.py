@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from .forms import SubscriberForm
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-
+from django.urls import reverse
+from django.contrib.auth.forms import  AuthenticationForm
 
 def index(request):
 
@@ -16,21 +17,20 @@ def new_story_form(request):
 
 def login_user(request):
     if request.method == 'POST':
-        form = SubscriberForm(request.POST)
-        #if form.is_valid():
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None:
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(username=username, password=password)      
             login(request,user)
             return HttpResponseRedirect('/')
-        else:
-            return render(request,"login.html", {'form':form})    
+            
     else:
-        form = SubscriberForm()
+        form = AuthenticationForm()
+        
     return render(request, "login.html", {'form':form})
 
 def logout_user(request):
     logout(request)
-    return HttpResponseRedirect('/login')
+    return HttpResponseRedirect('/login/')  
 
