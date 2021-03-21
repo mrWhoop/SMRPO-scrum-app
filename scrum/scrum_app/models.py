@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class Project(models.Model):
 
-    projectName = models.TextField
+    projectName = models.TextField()
 
     # lastnik projekta
     product_owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product_owner')
@@ -20,24 +20,24 @@ class DevTeamMember(models.Model):
 
 class Sprint(models.Model):
 
-    start = models.DateTimeField
+    start = models.DateTimeField()
 
-    end = models.DateTimeField
+    end = models.DateTimeField()
 
-    expectedSpeed = models.IntegerField
+    expectedSpeed = models.IntegerField()
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
 class Story(models.Model):
 
-    name = models.TextField
+    name = models.TextField()
 
-    description = models.TextField
+    description = models.TextField()
 
     # possible values: 'must have', 'should have', 'could have', 'won't have'
-    priority = models.TextField
+    priority = models.TextField()
 
-    businessValue = models.IntegerField
+    businessValue = models.IntegerField()
 
     # casovna zahtevnost
     timeCost = models.DecimalField(max_digits=5, decimal_places=2, null=True)
@@ -51,7 +51,7 @@ class Story(models.Model):
     comment = models.TextField(null=True)
 
     # 'new', 'in progress', 'done', 'accepted', 'rejected', 'incomlete'
-    developmentStatus = models.TextField
+    developmentStatus = models.TextField()
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
