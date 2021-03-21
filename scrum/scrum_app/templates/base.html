@@ -8,7 +8,9 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
     <link href="{% static '/css/main.css' %}" rel="stylesheet">
-    
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     {% block css %}
     
     {% endblock %}
@@ -46,12 +48,13 @@
 				  	</li>
 
 				  	<li class="nav-item">
-				    	<a class="nav-link {{ activate_newstory }}" href="new_story">New story</a>
+				    	<a class="nav-link {{ activate_newstory }}" href="/new_story/">New story</a>
 				  	</li>
-
+					{% if user.is_staff %}
 				  	<li class="nav-item">
-				    	<a class="nav-link" href="#">TODO</a>
+				    	<a class="nav-link {{ activate_newproject }}" href="/new_project/">New project</a>
 				  	</li>
+					{% endif %}
 
 				  	<li class="nav-item">
 				    	<a class="nav-link" href="#">TODO</a>

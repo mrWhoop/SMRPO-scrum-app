@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h4>New project</h4>
+<form id="new-project-form" method="post" 
+action="{% url 'new_project_form' %}" class="col-4">
+    {% csrf_token %}
+	<div class="mb-3">
+		<label class="form-label" for="project_name">Name:</label>
+		<input class="form-control" type="text" name="project_name">
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="product_owner">Product owner:</label>
+		<select class="form-control" name="product_owner">
+        {% for user in users %}
+            <option value="{{ user.username }}">{{ user.username }}</option>
+        {% endfor %}
+        </select>
+	</div>
+	<div class="mb-3">
+        <label class="form-label" for="scrum_master">Scrum master:</label>
+		<select class="form-control" name="scrum_master">
+        {% for user in users %}
+            <option value="{{ user.username }}">{{ user.username }}</option>
+        {% endfor %}
+        </select>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="developers">Developers:</label>
+		<select class="form-select" multiple name="developers"  >
+        {% for user in users %}
+            <option value="{{ user.username }}" selected="selected">{{ user.username }}</option>
+        {% endfor %}
+        </select>
+	</div>
+    <div class="mb-3"></div>
+    <input type="submit" value="Add project" 
+                       class="btn btn-primary pull-right" />
+ 
+
+</form>
+
+{% endblock %}
