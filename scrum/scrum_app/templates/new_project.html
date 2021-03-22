@@ -9,12 +9,12 @@ action="{% url 'new_project_form' %}" class="col-4">
 	<div class="mb-3">
 		<label class="form-label" for="project_name">Name:</label>
 		<input class="form-control" type="text" name="project_name">
+        {% if name_exists == True %}
+            <p class="text-danger">
+                Project name already exists!
+            </p>
+        {% endif %}
 	</div>
-    {% if name_exists == True %}
-    <p class=" label label-danger">
-        Project name already exists!
-    </p>
-    {% endif %}
 	<div class="mb-3">
 		<label class="form-label" for="product_owner">Product owner:</label>
 		<select class="form-control" name="product_owner">
@@ -44,7 +44,7 @@ action="{% url 'new_project_form' %}" class="col-4">
                        class="btn btn-primary pull-right" />
     {% if success == True %}
     </br>
-    <p class=" label label-danger">
+    <p class="text-success">
         Project added succesfuly!
     </p>
     {% endif %}

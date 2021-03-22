@@ -50,7 +50,7 @@ class Story(models.Model):
 
     comment = models.TextField(null=True)
 
-    # 'new', 'in progress', 'done', 'accepted', 'rejected', 'incomlete'
+    # 'new', 'in progress', 'done', 'accepted', 'rejected', 'incomplete'
     developmentStatus = models.TextField()
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

@@ -22,7 +22,7 @@
 <body>
 	
 		<div class="topnav">
-			<h1  href="/">SCRUM App</h1>
+			<h1>SCRUM App</h1>
 			{% if user.is_authenticated %}
 			<div class="topnav-right">
 				<div class="login-data">
@@ -36,7 +36,7 @@
 
 	
 
-	<div class="container-fluid nav_main_container">
+	<div class="container-fluid nav_main_container overflow-hidden">
 
 		<div class="row h-100">
 
@@ -62,7 +62,7 @@
 				</ul>
 			</nav>
 
-			<div class="col-11 main_container">
+			<div class="col-11 main_container overflow-auto h-100">
 				{% block content %}
 				{% endblock %}
 			</div>

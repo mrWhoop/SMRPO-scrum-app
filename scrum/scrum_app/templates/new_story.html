@@ -3,30 +3,98 @@
 {% block content %}
 
 <h4>New story</h4>
-<form class="col-4">
+<form id="new-story-form" method="post"
+action="{% url 'new_story_form' %}" class="col-4">
+	{% csrf_token %}
 	<div class="mb-3">
 		<label class="form-label" for="story_name">Name:</label>
 		<input class="form-control" type="text" name="story_name">
+		{% if name_exists %}
+			<p class="text-danger">
+				Story name already exists!
+			</p>
+		{% endif %}
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_description">Description:</label>
 		<input class="form-control" type="text" name="story_description">
 	</div>
 	<div class="mb-3">
-	<label class="form-label" for="story_priority">Priority:</label>
-	<select class="form-control" name="stoy_priority">
-		<option value="must_have">Must have</option>
-		<option value="should_have">Should have</option>
-		<option value="could_have">Could have</option>
-		<option value="wont_have">Won't have</option>
-	</select>
+		<label class="form-label" for="story_priority">Priority:</label>
+		<select class="form-control" name="story_priority">
+			<!--option value=""></option-->
+			<option value="must_have">Must have</option>
+			<option value="should_have">Should have</option>
+			<option value="could_have">Could have</option>
+			<option value="wont_have">Won't have</option>
+		</select>
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_bussines_value">Bussines value:</label>
 		<input class="form-control" type="text" name="story_bussines_value">
 	</div>
-
-
+	<div class="mb-3">
+		<label class="form-label" for="time_cost">Time cost:</label>
+		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_cost">
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="time_spent">Time spent:</label>
+		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_spent">
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="asignee">Asignee:</label>
+		<select class="form-control" name="asignee">
+			<!--option value=""></option-->
+			{% for user in users %}
+				<option value="{{ user.id }}">{{ user.username }}</option>
+			{%endfor%}
+		</select>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="user_confirmed">User confirmed:</label>
+		<input class="form-check-label" type="checkbox" name="user_confirmed">
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="comment">Comment:</label>
+		<textarea class="form-control" rows="5" type="textfield" name="comment"></textarea>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="story_status">Status:</label>
+		<select class="form-control" name="story_status">
+			<!--option value=""></option-->
+			<option value="new">New</option>
+			<option value="in_progress">In progress</option>
+			<option value="done">Done</option>
+			<option value="accepted">Accepted</option>
+			<option value="rejected">Rejected</option>
+			<option value="incomplete">Incomplete</option>
+		</select>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="project">Project:</label>
+		<select class="form-control" name="project">
+			<!--option value=""></option-->
+			{% for project in projects  %}
+				<option value="{{ project.id }}">{{ project.projectName }}</option>
+			{%endfor%}
+		</select>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="sprint">Sprint:</label>
+		<select class="form-control" name="sprint">
+			<!--option value=""></option-->
+			{% for sprint in sprints  %}
+				<option value="{{ sprint.id }}">{{ sprint.id }}</option>
+			{%endfor%}
+		</select>
+	</div>
+	<input type="submit" value="Add story" class="btn btn-primary pull-right" />
+	{% if success %}
+	    </br>
+	    <p class="text-success">
+	        Project added succesfuly!
+	    </p>
+    {% endif %}
 </form>
 
 {% endblock %}
