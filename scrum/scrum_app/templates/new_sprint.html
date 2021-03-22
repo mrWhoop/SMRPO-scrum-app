@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h4>Sprint</h4>
+<form id="new-sprint-form" method="post"
+action="{% url 'new_sprint_form' %}" class="col-4">
+    {% csrf_token %}
+	<div class="mb-3">
+		<label class="form-label" for="project">Project:</label>
+		<select class="form-control" name="project" required>
+            <option hidden></option>
+        {% for project in projects %}
+            <option value="{{ project.id }}">{{ project.projectName }}</option>
+        {% endfor %}
+        </select>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="start">Starting on:</label>
+		<input class="form-control" type="datetime-local" name="start" min="{{minStartDate}}" required>
+        {% if startDateOverlapping == True %}
+        </br>
+        <p class="text-success">
+            Start cannot be set during an existing sprint!
+        </p>
+        {% endif %}
+        {% if startBigger == True %}
+        </br>
+        <p class="text-success">
+            Start date cannot be set later in time than the begining!
+        </p>
+        {% endif %}
+	</div>
+	<div class="mb-3">
+        <label class="form-label" for="end">Ending on:</label>
+		<input class="form-control" type="datetime-local" name="end" min="{{minEndDate}}" required>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="speed">Expected speed:</label>
+		<input class="form-control" type="number" name="speed" value="{{speedField}}" required>
+	</div>
+    <div class="mb-3"></div>
+    <input type="submit" value="Add sprint"
+                       class="btn btn-primary pull-right" />
+    {% if success == True %}
+    </br>
+    <p class="text-success">
+        Sprint added succesfuly!
+    </p>
+    {% endif %}
+
+</form>
+
+{% endblock %}

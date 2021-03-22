@@ -44,10 +44,6 @@ class Story(models.Model):
 
     timeSpent = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
-    assignedUser = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-
-    userConfirmed = models.BooleanField(default=False)
-
     comment = models.TextField(null=True)
 
     # 'new', 'in progress', 'done', 'accepted', 'rejected', 'incomplete'
@@ -57,3 +53,15 @@ class Story(models.Model):
 
     # do we need to save the state as was after the sprint comlpetion or can we rewire to new sprint in case of rejection
     sprint = models.ForeignKey(Sprint, on_delete=models.CASCADE, null=True)
+
+class Task(models.Model):
+
+    story = models.ForeignKey(Story, on_delete=models.CASCADE)
+
+    time_spent = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+
+    description = models.TextField()
+
+    assignedUser = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+
+    userConfirmed = models.BooleanField(default=False)
