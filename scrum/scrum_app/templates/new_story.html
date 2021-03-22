@@ -83,8 +83,8 @@ action="{% url 'new_story_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="sprint">Sprint:</label>
-		<select class="form-control" name="sprint">
-			<option value="">None</option>
+		<select class="form-control" name="sprint"
+<!-- 		<option value="">None</option> --!>
 			{% for sprint in sprints  %}
 				<option value="{{ sprint.id }}">{{ sprint.id }}</option>
 			{%endfor%}
