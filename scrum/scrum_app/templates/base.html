@@ -46,16 +46,21 @@
 				 	<li class="nav-item">
 				    	<a class="nav-link {{ activate_home }}" href="/">Home</a>
 				  	</li>
-
-				  	<li class="nav-item">
-				    	<a class="nav-link {{ activate_newstory }}" href="/new_story/">New story</a>
-				  	</li>
 					{% if user.is_staff %}
 				  	<li class="nav-item">
 				    	<a class="nav-link {{ activate_newproject }}" href="/new_project/">New project</a>
 				  	</li>
 					{% endif %}
-
+					{% if user.is_staff %}
+				  	<li class="nav-item">
+				    	<a class="nav-link {{ activate_newsprint }}" href="/new_sprint/">New sprint</a>
+				  	</li>
+					{% endif %}
+					{% if user.is_staff %}
+				  	<li class="nav-item">
+				    	<a class="nav-link {{ activate_newstory }}" href="/new_story/">New story</a>
+				  	</li>
+					{% endif %}
 				  	<li class="nav-item">
 				    	<a class="nav-link" href="#">TODO</a>
 				  	</li>
