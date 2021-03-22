@@ -49,26 +49,26 @@ def new_story_form(request):
         comment = request.POST['comment']
         story_status = request.POST['story_status']
         project = request.POST['project']
-        sprint = request.POST['sprint']
-        story, created = Story.objects.get_or_create(name=story_name,
-                                                     description=story_description,
-                                                     priority=story_priority,
-                                                     businessValue=story_bussines_value,
-                                                     timeCost=time_cost,
-                                                     timeSpent=time_spent,
-                                                     # assignedUser_id=asignee,
-                                                     # userConfirmed=user_confirmed,
-                                                     comment=comment,
-                                                     developmentStatus=story_status,
-                                                     project_id=project,
-                                                     sprint_id=sprint)
-        if not created:
+        sprint = request.POST['sprint'] if request.POST['sprint'] else None
+
+        try:
+            Story.objects.get(name=story_name)
             name_exists = not name_exists
-        else:
+        except Story.DoesNotExist:
+            story = Story(name=story_name,
+                          description=story_description,
+                          priority=story_priority,
+                          businessValue=story_bussines_value,
+                          timeCost=time_cost,
+                          timeSpent=time_spent,
+                          # assignedUser_id=asignee,
+                          # userConfirmed=user_confirmed,
+                          comment=comment,
+                          developmentStatus=story_status,
+                          project_id=project,
+                          sprint_id=sprint)
             story.save()
             success = not success
-
-
 
     return render(request,    'new_story.html', 
                   context={   'activate_newstory': 'active', 

@@ -30,7 +30,7 @@ class Sprint(models.Model):
 
 class Story(models.Model):
 
-    name = models.TextField()
+    name = models.TextField(unique = True)
 
     description = models.TextField()
 
