@@ -52,7 +52,7 @@ def new_story_form(request):
         sprint = request.POST['sprint'] if request.POST['sprint'] else None
 
         try:
-            Story.objects.get(name=story_name)
+            Story.objects.get(name=story_name, project_id=project)
             name_exists = not name_exists
         except Story.DoesNotExist:
             story = Story(name=story_name,
