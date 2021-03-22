@@ -18,7 +18,7 @@
 /* Right-aligned section inside the top navigation */
 .topnav-right {
 	float: right;
-  }
+}
 
 .topnav {
 	overflow: hidden;
@@ -33,8 +33,8 @@
 	text-decoration: none;
 	font-size: 17px;
 	margin-top: 30px;
-  position: relative;
-  
+  	position: relative;
+  	margin-right: 30px;
 }
 
 .topnav .login-data {
@@ -42,13 +42,11 @@
 	padding: 0 16px;
 	margin-top: 30px;
 	text-decoration: none;
-	
 }
 
 .topnav h1 {
 	float: left;
 	margin: 30px;
 	font-size: 21pt;
-	
 }
 
