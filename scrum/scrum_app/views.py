@@ -9,14 +9,25 @@ from django.contrib.auth.forms import  AuthenticationForm
 from django.contrib.auth import get_user_model
 from .models import Sprint, Story, Project, DevTeamMember
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 import sys
 
 def index(request):
 
-    text = 'Hello World!'
+    user = get_user_model().objects.get(id=request.user.id)
+    projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
 
-    return render(request, 'home.html', context={'text': text, 'string': 'string', 'activate_home':'active'})
+    return render(request, 'home.html', context={'projects': projects})
+
+def project(request):
+
+    project_id = request.GET.get('id')
+
+    project = Project.objects.get(id=project_id)
+    stories = Story.objects.filter(project=project)
+
+    return render(request, 'project.html', context={'project': project, 'stories': stories})
 
 def new_story_form(request):
     users =  get_user_model().objects.all()

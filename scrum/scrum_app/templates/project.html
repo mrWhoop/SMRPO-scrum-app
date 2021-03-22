@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% for story in stories %}
+<h4>{{ project.name }}</h4>
+<div>
+    <h5>{{story.name}}</h5>
+    <div>Description:
+    {{story.description}}</div>
+    <div>Priority:
+    {{story.priority}}</div>
+    <div>Business value:
+    {{story.businessValue}}</div>
+    <div>Time till finish:
+    {{story.timeCost}}</div>
+    <div>Time spent:
+    {{story.timeSpent}}</div>
+    <div>Comment:
+    {{story.comment}}</div>
+    <div>Development status:
+    {{story.developmentStatus}}</div>
+    <div>Sprint:
+    {{story.sprint.id}}</div>
+</div>
+{% endfor %}
+
+{% endblock %}
