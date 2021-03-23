@@ -67,3 +67,9 @@
 .card-body div {
 	margin: 10px 0;
 }
+
+.main_container .title {
+	border-bottom: solid 1px #000;
+	padding-bottom: 25px;
+	margin-bottom: 20px;
+}

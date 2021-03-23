@@ -3,19 +3,17 @@
 {% block content %}
 
 
-<h4>Projects</h4>
-
-<div class="list-group col-4 project_list">
+<h4 class="title">Projects</h4>
 
 	{% for project in projects %}
 
-		<div class="list-group-item list-group-item-action">
-			<h5>{{ project.projectName }}</h5>
-			<a href="project?id={{ project.id }}" style="color:#4F8EC3">details</a>
+	<div class="card col-4 project_list">
+		<div class="card-body">
+			<h5 style="margin-bottom: 15px;">{{ project.projectName }}</h5>
+			<a class="btn btn-primary stretched-link" href="project?id={{ project.id }}">Details</a>
 		</div>
-
+	</div>
+	
 	{% endfor %}
-
-</div>
 
 {% endblock %}
