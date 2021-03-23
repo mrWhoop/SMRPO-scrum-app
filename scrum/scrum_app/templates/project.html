@@ -2,6 +2,8 @@
 {% load static %}
 {% block content %}
 
+<form id="new-project-form" method="post" action="{% url 'project' %}" class="col-4">
+{% csrf_token %}
 {% for story in stories %}
 <h4>{{ project.name }}</h4>
 <div>
@@ -12,7 +14,7 @@
     {{story.priority}}</div>
     <div>Business value:
     {{story.businessValue}}</div>
-    <div>Time till finish:
+    <div>Estimated time:
     {{story.timeCost}}</div>
     <div>Time spent:
     {{story.timeSpent}}</div>
@@ -20,10 +22,31 @@
     {{story.comment}}</div>
     <div>Development status:
     {{story.developmentStatus}}</div>
-    <div>Sprint:
-    {{story.sprint.id}}</div>
-    <div>Add to sprint:</div>
+
+    {% if story.sprint == None %}
+
+
+        <div class="mb-3">
+            <label class="form-label" for="sprints{{ story.id }}">Sprints:</label>
+            <select class="form-select" multiple name="sprints{{ story.id }}"  >
+                <option value="None" hidden></option>
+                {% for sprint in sprints %}
+                    <option value="{{ sprint.id }}" > {{ sprint.start }} - {{sprint.end}} </option>
+                {% endfor %}
+            </select>
+        </div>
+
+    {% else %}
+
+        <div>Sprint:
+        {{story.sprint.id}}</div>
+
+    {% endif %}
+
 </div>
 {% endfor %}
 
+    <input type="submit" value="Confirm changes" class="btn btn-primary pull-right" />
+
+</form>
 {% endblock %}

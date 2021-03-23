@@ -27,7 +27,11 @@ def project(request):
     project = Project.objects.get(id=project_id)
     stories = Story.objects.filter(project=project)
 
-    return render(request, 'project.html', context={'project': project, 'stories': stories})
+    today = datetime.date.today()
+
+    sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
+
+    return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints})
 
 def new_story_form(request):
     users =  get_user_model().objects.all()
@@ -43,13 +47,16 @@ def new_story_form(request):
         story_priority = request.POST["story_priority"];
         story_bussines_value = request.POST["story_bussines_value"]
         time_cost = request.POST["time_cost"]
-        time_spent = request.POST["time_spent"]
+        # time_spent = request.POST["time_spent"]
         # asignee = request.POST["asignee"]
         # user_confirmed = request.POST.get('user_confirmed', "") == "on"
         comment = request.POST['comment']
         story_status = request.POST['story_status']
         project = request.POST['project']
         sprint = request.POST['sprint'] if request.POST['sprint'] else None
+
+        if time_cost == '':
+            time_cost = None
 
         try:
             Story.objects.get(name=story_name, project_id=project)
@@ -60,7 +67,7 @@ def new_story_form(request):
                           priority=story_priority,
                           businessValue=story_bussines_value,
                           timeCost=time_cost,
-                          timeSpent=time_spent,
+                          # timeSpent=time_spent,
                           # assignedUser_id=asignee,
                           # userConfirmed=user_confirmed,
                           comment=comment,

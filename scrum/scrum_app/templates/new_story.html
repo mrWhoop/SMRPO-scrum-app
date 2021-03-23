@@ -17,7 +17,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_description">Description:</label>
-		<input class="form-control" type="text" name="story_description" required>
+		<textarea class="form-control" rows="5" type="textfield" name="story_description" required></textarea>
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_priority">Priority:</label>
@@ -31,17 +31,18 @@ action="{% url 'new_story_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_bussines_value">Bussines value:</label>
-		<input class="form-control" type="text" name="story_bussines_value" required>
+		<input class="form-control" type="number" name="story_bussines_value" required>
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="time_cost">Time cost:</label>
-		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_cost" required>
+		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_cost">
 	</div>
+	<!--
 	<div class="mb-3">
 		<label class="form-label" for="time_spent">Time spent:</label>
-		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_spent" required>
+		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_spent">
 	</div>
-
+	--!>
 	<!--
 	<div class="mb-3">
 		<label class="form-label" for="asignee">Asignee:</label>
@@ -95,7 +96,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 	{% if success %}
 	    </br>
 	    <p class="text-success">
-	        Project added succesfuly!
+	        Story added successfully
 	    </p>
     {% endif %}
 </form>
