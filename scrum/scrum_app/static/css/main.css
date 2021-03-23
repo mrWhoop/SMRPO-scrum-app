@@ -50,3 +50,20 @@
 	font-size: 21pt;
 }
 
+.story_cards {
+	margin: 20px 0;
+}
+
+.project_list {
+	margin-top: 20px;
+}
+
+.float_button {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+}
+
+.card-body div {
+	margin: 10px 0;
+}

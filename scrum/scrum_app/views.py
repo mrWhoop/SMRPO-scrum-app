@@ -19,17 +19,27 @@ def index(request):
     user = get_user_model().objects.get(id=request.user.id)
     projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
 
-    return render(request, 'home.html', context={'projects': projects})
+    return render(request, 'home.html', context={'projects': projects,
+                                                  'activate_home':'active'})
 
 def project(request):
 
     if request.method == 'POST':
-        for story, sprint in request.POST.items():
-            if sprint == 'None' or story == 'csrfmiddlewaretoken':
+
+        print("OUT: ", list(request.POST.items()), file=sys.stderr)
+
+        for name, value in request.POST.items():
+            if name == 'csrfmiddlewaretoken':
                 continue
-            StoryObject = Story.objects.get(id=int(story))
-            StoryObject.sprint_id = sprint
-            StoryObject.save()
+            field, story_id = name.split("_")
+            if field == 'timecost' and value != 'None':
+                StoryObject = Story.objects.get(id=int(story_id))
+                StoryObject.timeCost = value
+                StoryObject.save()
+            if field == 'sprint' and value != 'None':
+                StoryObject = Story.objects.get(id=int(story_id))
+                StoryObject.sprint_id = value
+                StoryObject.save()
 
     project_id = request.GET.get('id')
 
@@ -40,11 +50,11 @@ def project(request):
 
     sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
 
-    return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints})
+    return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active'})
 
 def new_story_form(request):
     users =  get_user_model().objects.all()
-    #print(Project.objects.all(), file=sys.stderr)
+    #print("OUT: ", story, file=sys.stderr)
     projects = Project.objects.all()
     sprints = Sprint.objects.all()
     success = False
@@ -68,7 +78,7 @@ def new_story_form(request):
             time_cost = None
 
         try:
-            Story.objects.get(name=story_name, project_id=project)
+            Story.objects.get(name=story_name, project_id=int(project))
             name_exists = not name_exists
         except Story.DoesNotExist:
             story = Story(name=story_name,
@@ -177,6 +187,7 @@ def new_sprint_form(request):
                                                                    'startBigger': startBigger,
                                                                    'success': success,
                                                                    'projectField': project_id,
+                                                                   'activate_newsprint': 'active',
                                                                    'speedField': speed})
             if start > end:
                 startBigger = True
@@ -187,6 +198,7 @@ def new_sprint_form(request):
                                                                    'startBigger': startBigger,
                                                                    'success': success,
                                                                    'projectField': project_id,
+                                                                   'activate_newsprint': 'active',
                                                                    'speedField': speed})
 
 
@@ -201,4 +213,5 @@ def new_sprint_form(request):
     return render(request, 'new_sprint.html', context={'projects': projects,
                                                        'minStartDate': minStartDate,
                                                        'minEndDate': minEndDate,
+                                                       'activate_newsprint': 'active',
                                                        'success': success})

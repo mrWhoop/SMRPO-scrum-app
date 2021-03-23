@@ -4,9 +4,18 @@
 
 
 <h4>Projects</h4>
-    {% for project in projects %}
-    <h5>{{ project.projectName }}</h5>
-    <a href="project?id={{ project.id }}" style="color:#4F8EC3">details</a>
-    {% endfor %}
+
+<div class="list-group col-4 project_list">
+
+	{% for project in projects %}
+
+		<div class="list-group-item list-group-item-action">
+			<h5>{{ project.projectName }}</h5>
+			<a href="project?id={{ project.id }}" style="color:#4F8EC3">details</a>
+		</div>
+
+	{% endfor %}
+
+</div>
 
 {% endblock %}

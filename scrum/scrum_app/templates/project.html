@@ -4,50 +4,65 @@
 
 <form id="new-project-form" method="post" action="" class="col-4">
 {% csrf_token %}
-<h3>{{ project.projectName }}</h3>
+<h4>{{ project.projectName }}</h4>
 {% for story in stories %}
 
-<div>
-    <h5>{{story.name}}</h5>
-    <div>Description:
-    {{story.description}}</div>
-    <div>Priority:
-    {{story.priority}}</div>
-    <div>Business value:
-    {{story.businessValue}}</div>
-    <div>Estimated time:
-    {{story.timeCost}}</div>
-    <div>Time spent:
-    {{story.timeSpent}}</div>
-    <div>Comment:
-    {{story.comment}}</div>
-    <div>Development status:
-    {{story.developmentStatus}}</div>
 
-    {% if story.sprint == None and story.timeCost != None and story.developmentStatus != 'accepted' %}
+<div class="card story_cards">
+    <div class="card-header">{{story.name}}</div>
+    <div class="card-body">
+        <div>Description:
+        {{story.description}}</div>
+        <div>Priority:
+        {{story.priority}}</div>
+        <div>Business value:
+        {{story.businessValue}}</div>
 
 
+        {% if story.sprint == None %}
         <div class="mb-3">
-            <label class="form-label" for="sprints{{ story.id }}">Availabele sprints:</label>
-            <select class="form-select" name="{{ story.id }}"  >
-                <option value="None" hidden></option>
-                {% for sprint in sprints %}
-                <option value="{{ sprint.id }}" > {{ sprint.start }} - {{sprint.end}} </option>
-                {% endfor %}
-            </select>
+            <div>
+                <label class="form-label" for="time_cost">Estimated time:</label>
+                <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{2}" type="text" name="timecost_{{ story.id }}">
+            </div>
         </div>
+        {% endif %}
 
-    {% else %}
 
-        <div>Sprint:
-        {{story.sprint.start}} - {{story.sprint.end}}</div>
 
-    {% endif %}
+        <div>Time spent:
+        {{story.timeSpent}}</div>
+        <div>Comment:
+        {{story.comment}}</div>
+        <div>Development status:
+        {{story.developmentStatus}}</div>
 
+        {% if story.sprint == None and story.timeCost != None and story.developmentStatus != 'accepted' %}
+
+
+            <div class="mb-3">
+                <label class="form-label" for="sprints{{ story.id }}">Availabele sprints:</label>
+                <select class="form-select" name="sprint_{{ story.id }}"  >
+                    <option value="None" hidden></option>
+                    {% for sprint in sprints %}
+                    <option value="{{ sprint.id }}" > {{ sprint.start }} - {{sprint.end}} </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        {% else %}
+
+            <div>Sprint:
+            {{story.sprint.start}} - {{story.sprint.end}}</div>
+
+        {% endif %}
+    </div>
 </div>
+
+
 {% endfor %}
 
-    <input type="submit" value="Confirm changes" class="btn btn-primary pull-right" />
+    <input type="submit" value="Confirm changes" class="btn btn-primary pull-right float_button" />
 
 </form>
 {% endblock %}
