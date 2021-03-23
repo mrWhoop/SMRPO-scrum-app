@@ -2,10 +2,11 @@
 {% load static %}
 {% block content %}
 
-<form id="new-project-form" method="post" action="{% url 'project' %}" class="col-4">
+<form id="new-project-form" method="post" action="" class="col-4">
 {% csrf_token %}
+<h3>{{ project.projectName }}</h3>
 {% for story in stories %}
-<h4>{{ project.name }}</h4>
+
 <div>
     <h5>{{story.name}}</h5>
     <div>Description:
@@ -27,11 +28,11 @@
 
 
         <div class="mb-3">
-            <label class="form-label" for="sprints{{ story.id }}">Sprints:</label>
-            <select class="form-select" multiple name="sprints{{ story.id }}"  >
+            <label class="form-label" for="sprints{{ story.id }}">Availabele sprints:</label>
+            <select class="form-select" name="{{ story.id }}"  >
                 <option value="None" hidden></option>
                 {% for sprint in sprints %}
-                    <option value="{{ sprint.id }}" > {{ sprint.start }} - {{sprint.end}} </option>
+                <option value="{{ sprint.id }}" > {{ sprint.start }} - {{sprint.end}} </option>
                 {% endfor %}
             </select>
         </div>
@@ -39,7 +40,7 @@
     {% else %}
 
         <div>Sprint:
-        {{story.sprint.id}}</div>
+        {{story.sprint.start}} - {{story.sprint.end}}</div>
 
     {% endif %}
 

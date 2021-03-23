@@ -22,6 +22,14 @@ def index(request):
 
 def project(request):
 
+    if request.method == 'POST':
+        for story, sprint in request.POST.items():
+            if sprint == 'None' or story == 'csrfmiddlewaretoken':
+                continue
+            StoryObject = Story.objects.get(id=int(story))
+            StoryObject.sprint_id = sprint
+            StoryObject.save()
+
     project_id = request.GET.get('id')
 
     project = Project.objects.get(id=project_id)
