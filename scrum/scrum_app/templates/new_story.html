@@ -42,7 +42,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 		<label class="form-label" for="time_spent">Time spent:</label>
 		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_spent">
 	</div>
-	--!>
+	-->
 	<!--
 	<div class="mb-3">
 		<label class="form-label" for="asignee">Asignee:</label>
@@ -92,7 +92,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 			{%endfor%}
 		</select>
 	</div>
-	<input type="submit" value="Add story" class="btn btn-primary pull-right" />
+	<input type="submit" value="Add story" class="btn btn-primary pull-right float_button" />
 	{% if success %}
 	    </br>
 	    <p class="text-success">

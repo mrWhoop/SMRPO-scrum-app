@@ -19,7 +19,8 @@ def index(request):
     user = get_user_model().objects.get(id=request.user.id)
     projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
 
-    return render(request, 'home.html', context={'projects': projects})
+    return render(request, 'home.html', context={'projects': projects,
+                                                  'activate_home':'active'})
 
 def project(request):
 
@@ -40,7 +41,7 @@ def project(request):
 
     sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
 
-    return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints})
+    return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active'})
 
 def new_story_form(request):
     users =  get_user_model().objects.all()
@@ -177,6 +178,7 @@ def new_sprint_form(request):
                                                                    'startBigger': startBigger,
                                                                    'success': success,
                                                                    'projectField': project_id,
+                                                                   'activate_newsprint': 'active',
                                                                    'speedField': speed})
             if start > end:
                 startBigger = True
@@ -187,6 +189,7 @@ def new_sprint_form(request):
                                                                    'startBigger': startBigger,
                                                                    'success': success,
                                                                    'projectField': project_id,
+                                                                   'activate_newsprint': 'active',
                                                                    'speedField': speed})
 
 
@@ -201,4 +204,5 @@ def new_sprint_form(request):
     return render(request, 'new_sprint.html', context={'projects': projects,
                                                        'minStartDate': minStartDate,
                                                        'minEndDate': minEndDate,
+                                                       'activate_newsprint': 'active',
                                                        'success': success})
