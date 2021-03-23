@@ -2,9 +2,12 @@
 {% load static %}
 {% block content %}
 
+<h4 class="title">Project name: {{ project.projectName }}</h4>
 <form id="new-project-form" method="post" action="" class="col-4">
 {% csrf_token %}
-<h4>{{ project.projectName }}</h4>
+
+<h5 >Story list:</h5>
+
 {% for story in stories %}
 
 

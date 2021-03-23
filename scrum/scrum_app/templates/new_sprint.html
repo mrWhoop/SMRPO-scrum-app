@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 
-<h4>Sprint</h4>
+<h4 class="title">Sprint</h4>
 <form id="new-sprint-form" method="post"
 action="{% url 'new_sprint_form' %}" class="col-4">
     {% csrf_token %}
