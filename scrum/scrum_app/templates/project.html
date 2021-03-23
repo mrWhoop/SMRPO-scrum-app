@@ -17,8 +17,19 @@
         {{story.priority}}</div>
         <div>Business value:
         {{story.businessValue}}</div>
-        <div>Estimated time:
-        {{story.timeCost}}</div>
+
+
+        {% if story.sprint == None %}
+        <div class="mb-3">
+            <div>
+                <label class="form-label" for="time_cost">Estimated time:</label>
+                <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{2}" type="text" name="timecost_{{ story.id }}">
+            </div>
+        </div>
+        {% endif %}
+
+
+
         <div>Time spent:
         {{story.timeSpent}}</div>
         <div>Comment:
@@ -31,7 +42,7 @@
 
             <div class="mb-3">
                 <label class="form-label" for="sprints{{ story.id }}">Availabele sprints:</label>
-                <select class="form-select" name="{{ story.id }}"  >
+                <select class="form-select" name="sprint_{{ story.id }}"  >
                     <option value="None" hidden></option>
                     {% for sprint in sprints %}
                     <option value="{{ sprint.id }}" > {{ sprint.start }} - {{sprint.end}} </option>

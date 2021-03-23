@@ -25,12 +25,21 @@ def index(request):
 def project(request):
 
     if request.method == 'POST':
-        for story, sprint in request.POST.items():
-            if sprint == 'None' or story == 'csrfmiddlewaretoken':
+
+        print("OUT: ", list(request.POST.items()), file=sys.stderr)
+
+        for name, value in request.POST.items():
+            if name == 'csrfmiddlewaretoken':
                 continue
-            StoryObject = Story.objects.get(id=int(story))
-            StoryObject.sprint_id = sprint
-            StoryObject.save()
+            field, story_id = name.split("_")
+            if field == 'timecost' and value != 'None':
+                StoryObject = Story.objects.get(id=int(story_id))
+                StoryObject.timeCost = value
+                StoryObject.save()
+            if field == 'sprint' and value != 'None':
+                StoryObject = Story.objects.get(id=int(story_id))
+                StoryObject.sprint_id = value
+                StoryObject.save()
 
     project_id = request.GET.get('id')
 
@@ -45,7 +54,7 @@ def project(request):
 
 def new_story_form(request):
     users =  get_user_model().objects.all()
-    #print(Project.objects.all(), file=sys.stderr)
+    #print("OUT: ", story, file=sys.stderr)
     projects = Project.objects.all()
     sprints = Sprint.objects.all()
     success = False
@@ -69,7 +78,7 @@ def new_story_form(request):
             time_cost = None
 
         try:
-            Story.objects.get(name=story_name, project_id=project)
+            Story.objects.get(name=story_name, project_id=int(project))
             name_exists = not name_exists
         except Story.DoesNotExist:
             story = Story(name=story_name,
