@@ -1,5 +1,6 @@
 import datetime, pytz
 
+from django.db.models.functions import Lower
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -33,7 +34,7 @@ def project(request):
     project_id = request.GET.get('id')
 
     project = Project.objects.get(id=project_id)
-    stories = Story.objects.filter(project=project)
+    stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
 
     today = datetime.date.today()
 

@@ -24,7 +24,7 @@
     <div>Development status:
     {{story.developmentStatus}}</div>
 
-    {% if story.sprint == None %}
+    {% if story.sprint == None and story.timeCost != None and story.developmentStatus != 'accepted' %}
 
 
         <div class="mb-3">
