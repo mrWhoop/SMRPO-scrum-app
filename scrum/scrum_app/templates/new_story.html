@@ -8,7 +8,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 	{% csrf_token %}
 	<div class="mb-3">
 		<label class="form-label" for="story_name">Name:</label>
-		<input class="form-control" type="text" name="story_name">
+		<input class="form-control" type="text" name="story_name" required>
 		{% if name_exists %}
 			<p class="text-danger">
 				Story name already exists!
@@ -17,11 +17,11 @@ action="{% url 'new_story_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_description">Description:</label>
-		<input class="form-control" type="text" name="story_description">
+		<textarea class="form-control" rows="5" type="textfield" name="story_description" required></textarea>
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_priority">Priority:</label>
-		<select class="form-control" name="story_priority">
+		<select class="form-control" name="story_priority" required>
 			<!--option value=""></option-->
 			<option value="must_have">Must have</option>
 			<option value="should_have">Should have</option>
@@ -31,16 +31,18 @@ action="{% url 'new_story_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_bussines_value">Bussines value:</label>
-		<input class="form-control" type="text" name="story_bussines_value">
+		<input class="form-control" type="number" name="story_bussines_value" required>
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="time_cost">Time cost:</label>
 		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_cost">
 	</div>
+	<!--
 	<div class="mb-3">
 		<label class="form-label" for="time_spent">Time spent:</label>
 		<input class="form-control" maxlength="5" pattern="\d*" type="text" name="time_spent">
 	</div>
+	--!>
 	<!--
 	<div class="mb-3">
 		<label class="form-label" for="asignee">Asignee:</label>
@@ -54,7 +56,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 	<div class="mb-3">
 		<label class="form-label" for="user_confirmed">User confirmed:</label>
 		<input class="form-check-label" type="checkbox" name="user_confirmed">
-	</div>--!>
+	</div>-->
 
 	<div class="mb-3">
 		<label class="form-label" for="comment">Comment:</label>
@@ -62,7 +64,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_status">Status:</label>
-		<select class="form-control" name="story_status">
+		<select class="form-control" name="story_status" required>
 			<!--option value=""></option-->
 			<option value="new">New</option>
 			<option value="in_progress">In progress</option>
@@ -74,7 +76,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="project">Project:</label>
-		<select class="form-control" name="project">
+		<select class="form-control" name="project" required>
 			<!--option value=""></option-->
 			{% for project in projects  %}
 				<option value="{{ project.id }}">{{ project.projectName }}</option>
@@ -84,7 +86,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 	<div class="mb-3">
 		<label class="form-label" for="sprint">Sprint:</label>
 		<select class="form-control" name="sprint">
-			<!--option value=""></option-->
+			<option value="">None</option>
 			{% for sprint in sprints  %}
 				<option value="{{ sprint.id }}">{{ sprint.id }}</option>
 			{%endfor%}
@@ -94,7 +96,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 	{% if success %}
 	    </br>
 	    <p class="text-success">
-	        Project added succesfuly!
+	        Story added successfully
 	    </p>
     {% endif %}
 </form>

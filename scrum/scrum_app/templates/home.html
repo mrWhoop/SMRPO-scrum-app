@@ -2,12 +2,11 @@
 {% load static %}
 {% block content %}
 
-<h4>Home</h4>
 
-<div>
-    {{ text }}
-    {{ string }}
-</div>
-
+<h4>Projects</h4>
+    {% for project in projects %}
+    <h5>{{ project.projectName }}</h5>
+    <a href="project?id={{ project.id }}" style="color:#4F8EC3">details</a>
+    {% endfor %}
 
 {% endblock %}

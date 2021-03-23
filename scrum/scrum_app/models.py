@@ -58,6 +58,8 @@ class Task(models.Model):
 
     story = models.ForeignKey(Story, on_delete=models.CASCADE)
 
+    timeCost = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+
     time_spent = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
     description = models.TextField()

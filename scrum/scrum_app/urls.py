@@ -16,4 +16,5 @@ urlpatterns = [
     url(r'^logout/$', views.logout_user, name='logout_user'),
     url(r'^new_project/$', views.new_project_form, name='new_project_form'),
     url(r'^new_sprint/$', views.new_sprint_form, name='new_sprint_form'),
+    url(r'^project/$', views.project, name='project'),
 ]

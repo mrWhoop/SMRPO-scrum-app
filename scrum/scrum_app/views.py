@@ -1,5 +1,6 @@
 import datetime, pytz
 
+from django.db.models.functions import Lower
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -9,14 +10,37 @@ from django.contrib.auth.forms import  AuthenticationForm
 from django.contrib.auth import get_user_model
 from .models import Sprint, Story, Project, DevTeamMember
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 import sys
 
 def index(request):
 
-    text = 'Hello World!'
+    user = get_user_model().objects.get(id=request.user.id)
+    projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
 
-    return render(request, 'home.html', context={'text': text, 'string': 'string', 'activate_home':'active'})
+    return render(request, 'home.html', context={'projects': projects})
+
+def project(request):
+
+    if request.method == 'POST':
+        for story, sprint in request.POST.items():
+            if sprint == 'None' or story == 'csrfmiddlewaretoken':
+                continue
+            StoryObject = Story.objects.get(id=int(story))
+            StoryObject.sprint_id = sprint
+            StoryObject.save()
+
+    project_id = request.GET.get('id')
+
+    project = Project.objects.get(id=project_id)
+    stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
+
+    today = datetime.date.today()
+
+    sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
+
+    return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints})
 
 def new_story_form(request):
     users =  get_user_model().objects.all()
@@ -32,32 +56,35 @@ def new_story_form(request):
         story_priority = request.POST["story_priority"];
         story_bussines_value = request.POST["story_bussines_value"]
         time_cost = request.POST["time_cost"]
-        time_spent = request.POST["time_spent"]
+        # time_spent = request.POST["time_spent"]
         # asignee = request.POST["asignee"]
         # user_confirmed = request.POST.get('user_confirmed', "") == "on"
         comment = request.POST['comment']
         story_status = request.POST['story_status']
         project = request.POST['project']
-        sprint = request.POST['sprint']
-        story, created = Story.objects.get_or_create(name=story_name,
-                                                     description=story_description,
-                                                     priority=story_priority,
-                                                     businessValue=story_bussines_value,
-                                                     timeCost=time_cost,
-                                                     timeSpent=time_spent,
-                                                     # assignedUser_id=asignee,
-                                                     # userConfirmed=user_confirmed,
-                                                     comment=comment,
-                                                     developmentStatus=story_status,
-                                                     project_id=project,
-                                                     sprint_id=sprint)
-        if not created:
+        sprint = request.POST['sprint'] if request.POST['sprint'] else None
+
+        if time_cost == '':
+            time_cost = None
+
+        try:
+            Story.objects.get(name=story_name, project_id=project)
             name_exists = not name_exists
-        else:
+        except Story.DoesNotExist:
+            story = Story(name=story_name,
+                          description=story_description,
+                          priority=story_priority,
+                          businessValue=story_bussines_value,
+                          timeCost=time_cost,
+                          # timeSpent=time_spent,
+                          # assignedUser_id=asignee,
+                          # userConfirmed=user_confirmed,
+                          comment=comment,
+                          developmentStatus=story_status,
+                          project_id=project,
+                          sprint_id=sprint)
             story.save()
             success = not success
-
-
 
     return render(request,    'new_story.html', 
                   context={   'activate_newstory': 'active', 
