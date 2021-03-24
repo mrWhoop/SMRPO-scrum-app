@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'^project/$', views.project, name='project'),
     url(r'^project/story/$', views.story, name='story'),
     url(r'^project/story/new_task/$', views.new_task_form, name='new_task_form'),
+    url(r'^my_tasks/$', views.my_tasks, name='my_tasks'),
 ]

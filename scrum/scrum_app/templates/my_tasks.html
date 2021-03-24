@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h4 class="title">My tasks</h4>
+
+<div class="col-4">
+
+	{% for project in data %}
+
+	<div class="card story_cards">
+
+	    <div class="card-header">
+	    		Project: {{ project.projectName }}
+		</div>
+
+	    <div class="card-body">
+
+	    	{% for story in data.project %}
+
+	    		<div class="card">
+
+	    			<div class="card-body">
+
+	    				{% for task in data.project.story %}
+
+	    				{{ task.description }}
+
+	    				{% endfor %}
+	    			</div>
+
+	    		</div>
+
+	    	{% endfor %}
+
+	    </div>
+	</div>
+
+	{% endfor %}
+
+</div>
+
+{% endblock %}

@@ -28,9 +28,6 @@ def index(request):
 def project(request):
 
     if request.method == 'POST':
-
-        print("OUT: ", list(request.POST.items()), file=sys.stderr)
-
         for name, value in request.POST.items():
             if name == 'csrfmiddlewaretoken':
                 continue
@@ -86,7 +83,7 @@ def new_story_form(request):
         # time_spent = request.POST["time_spent"]
         # asignee = request.POST["asignee"]
         # user_confirmed = request.POST.get('user_confirmed', "") == "on"
-        comment = request.POST['comment']
+        comment = request.POST['comment'] if request.POST['comment'] else None
         story_status = request.POST['story_status']
         project = request.POST['project']
         sprint = request.POST['sprint'] if request.POST['sprint'] else None
@@ -256,3 +253,58 @@ def new_sprint_form(request):
                                                        'minEndDate': minEndDate,
                                                        'activate_newsprint': 'active',
                                                        'success': success})
+
+
+def my_tasks(request):
+
+    user = get_user_model().objects.get(id=request.user.id)
+
+    
+    #for project in projects:
+    #    stories = Story.objects.filter(Q(project_id=project))
+    #    for story in stories:
+    #        tasks = Task.objects.filter(Q(story_id=story))
+    #        for task in tasks:
+    #            continue
+
+    projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
+    data = { project : { story : Task.objects.filter(Q(story_id=story)) for story in Story.objects.filter(Q(project_id=project)) } for project in projects}
+
+    #dobil bi rad storyje ločene na projekt
+    #stories = Story.objects.filter(Q(project_id=project))
+
+    #dobil bi rad taske ločene na story
+    #tasks = Task.objects.filter(Q(story_id=story))
+    print("OUT: ", data, file=sys.stderr)
+
+    return render(request, 'my_tasks.html', context={#'tasks': tasks,
+                                                     'data': data,
+                                                     #'stories': stories,
+                                                     'activate_mytasks': 'active'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

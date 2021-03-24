@@ -61,6 +61,11 @@
 				    	<a class="nav-link {{ activate_newstory }}" href="/new_story/">New story</a>
 				  	</li>
 					{% endif %}
+					{% if user.is_staff %}
+				  	<li class="nav-item">
+				    	<a class="nav-link {{ activate_mytasks }}" href="/my_tasks/">My tasks</a>
+				  	</li>
+					{% endif %}
 				</ul>
 			</nav>
 
