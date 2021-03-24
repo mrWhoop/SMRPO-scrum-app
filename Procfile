@@ -1,1 +1,1 @@
-web: gunicorn scrum-app987.wsgi
+web: gunicorn scrum_app.wsgi
