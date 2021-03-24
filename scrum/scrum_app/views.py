@@ -48,29 +48,8 @@ def project(request):
 
         project_id = request.GET.get('id')
 
-<<<<<<< HEAD
-    if request.method == 'POST':
-        for name, value in request.POST.items():
-            if name == 'csrfmiddlewaretoken':
-                continue
-            field, story_id = name.split("_")
-            if field == 'timecost' and value != 'None':
-                StoryObject = Story.objects.get(id=int(story_id))
-                StoryObject.timeCost = value
-                StoryObject.save()
-            if field == 'sprint' and value != 'None':
-                StoryObject = Story.objects.get(id=int(story_id))
-                StoryObject.sprint_id = value
-                StoryObject.save()
-
-    project_id = request.GET.get('id')
-
-    project = Project.objects.get(id=project_id)
-    stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
-=======
         project = Project.objects.get(id=project_id)
         stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
->>>>>>> 394c8ec569a752f71a2fb101367d81746fda1d0a
 
         today = datetime.date.today()
 
@@ -97,60 +76,7 @@ def story(request):
         return HttpResponseRedirect('/login')
 
 def new_story_form(request):
-<<<<<<< HEAD
-    users =  get_user_model().objects.all()
-    #print("OUT: ", story, file=sys.stderr)
-    projects = Project.objects.all()
-    sprints = Sprint.objects.all()
-    success = False
-    name_exists = False
 
-    if request.method == 'POST':
-        story_name = request.POST["story_name"]
-        story_description = request.POST["story_description"]
-        story_priority = request.POST["story_priority"]
-        story_bussines_value = request.POST["story_bussines_value"]
-        time_cost = request.POST["time_cost"]
-        # time_spent = request.POST["time_spent"]
-        # asignee = request.POST["asignee"]
-        # user_confirmed = request.POST.get('user_confirmed', "") == "on"
-        comment = request.POST['comment'] if request.POST['comment'] else None
-        story_status = request.POST['story_status']
-        project = request.POST['project']
-        sprint = request.POST['sprint'] if request.POST['sprint'] else None
-
-        if time_cost == '':
-            time_cost = None
-
-        try:
-            Story.objects.get(name=story_name, project_id=int(project))
-            name_exists = not name_exists
-        except Story.DoesNotExist:
-            story = Story(name=story_name,
-                          description=story_description,
-                          priority=story_priority,
-                          businessValue=story_bussines_value,
-                          timeCost=time_cost,
-                          # timeSpent=time_spent,
-                          # assignedUser_id=asignee,
-                          # userConfirmed=user_confirmed,
-                          comment=comment,
-                          developmentStatus=story_status,
-                          project_id=project,
-                          sprint_id=sprint)
-            story.save()
-            success = not success
-
-    return render(request,    'new_story.html', 
-                  context={   'activate_newstory': 'active', 
-                              'users': users,
-                              'projects': projects,
-                              'success': success,
-                              'sprints': sprints,
-                              'name_exists':name_exists
-                              })
-
-=======
     if request.user.is_authenticated:
         users =  get_user_model().objects.all()
         #print("OUT: ", story, file=sys.stderr)
@@ -205,7 +131,6 @@ def new_story_form(request):
                                 })
     else:
         return HttpResponseRedirect('/login')
->>>>>>> 394c8ec569a752f71a2fb101367d81746fda1d0a
 
 def new_project_form(request):
     if request.user.is_authenticated:
@@ -341,58 +266,14 @@ def new_sprint_form(request):
             sprint.save()
             success = True
 
-<<<<<<< HEAD
-    if request.method == 'POST':
-        project_id = request.POST['project']
-        start = request.POST['start']
-        start = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M')
-        start = utc.localize(start)
-        end = request.POST['end']
-        end = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M')
-        end = utc.localize(end)
-        speed = request.POST['speed']
-        # get all sprints on a project and check end date against starting date
-        project = Project.objects.get(id=project_id)
-        sprints = Sprint.objects.filter(project=project)
-        for sprint in sprints:
-            sprintEnd = sprint.end
-            if sprintEnd > start:
-                start_overlapping = True
-                return render(request, 'new_sprint.html', context={'projects': projects,
-                                                                   'minStartDate': minStartDate,
-                                                                   'minEndDate': minEndDate,
-                                                                   'startDateOverlapping': start_overlapping,
-                                                                   'startBigger': startBigger,
-                                                                   'success': success,
-                                                                   'projectField': project_id,
-                                                                   'activate_newsprint': 'active',
-                                                                   'speedField': speed})
-            if start > end:
-                startBigger = True
-                return render(request, 'new_sprint.html', context={'projects': projects,
-                                                                   'minStartDate': minStartDate,
-                                                                   'minEndDate': minEndDate,
-                                                                   'startDateOverlapping': start_overlapping,
-                                                                   'startBigger': startBigger,
-                                                                   'success': success,
-                                                                   'projectField': project_id,
-                                                                   'activate_newsprint': 'active',
-                                                                   'speedField': speed})
+        return render(request, 'new_sprint.html', context={'projects': projects,
+                                                        'minStartDate': minStartDate,
+                                                        'minEndDate': minEndDate,
+                                                        'activate_newsprint': 'active',
+                                                        'success': success})
+    else:
+        return HttpResponseRedirect('/login')
 
-
-        # add sprint
-        sprint = Sprint(project=project,
-                        start=start,
-                        end=end,
-                        expectedSpeed=speed)
-        sprint.save()
-        success = True
-
-    return render(request, 'new_sprint.html', context={'projects': projects,
-                                                       'minStartDate': minStartDate,
-                                                       'minEndDate': minEndDate,
-                                                       'activate_newsprint': 'active',
-                                                       'success': success})
 
 
 def my_tasks(request):
@@ -421,39 +302,3 @@ def my_tasks(request):
                                                      'data': data,
                                                      #'stories': stories,
                                                      'activate_mytasks': 'active'})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
-        return render(request, 'new_sprint.html', context={'projects': projects,
-                                                        'minStartDate': minStartDate,
-                                                        'minEndDate': minEndDate,
-                                                        'activate_newsprint': 'active',
-                                                        'success': success})
-    else:
-        return HttpResponseRedirect('/login')
->>>>>>> 394c8ec569a752f71a2fb101367d81746fda1d0a
