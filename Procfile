@@ -1,1 +1,1 @@
-web: python scrum/manage.py runserver 0.0.0.0:5000
+web: gunicorn scrum-app987.wsgi
