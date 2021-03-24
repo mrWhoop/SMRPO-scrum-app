@@ -19,5 +19,9 @@ urlpatterns = [
     url(r'^project/$', views.project, name='project'),
     url(r'^project/story/$', views.story, name='story'),
     url(r'^project/story/new_task/$', views.new_task_form, name='new_task_form'),
+<<<<<<< HEAD
     url(r'^my_tasks/$', views.my_tasks, name='my_tasks'),
+=======
+    url(r'^ajax/task/timeupdate/$', views.new_task_form, name='task_time_update'),
+>>>>>>> 394c8ec569a752f71a2fb101367d81746fda1d0a
 ]

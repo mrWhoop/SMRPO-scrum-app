@@ -2,6 +2,84 @@
 {% load static %}
 {% block content %}
 
+{% block javascript %}
+<script>
+var sw = {
+  // (A) INITIALIZE
+  etime : null, // HTML time display
+  erst : null, // HTML reset button
+  ego : null, // HTML start/stop button
+  init : function () {
+    // (A1) GET HTML ELEMENTS
+    sw.etime = document.getElementById("sw-time");
+    sw.erst = document.getElementById("sw-rst");
+    sw.ego = document.getElementById("sw-go");
+
+    // (A2) ENABLE BUTTON CONTROLS
+    sw.erst.addEventListener("click", sw.reset);
+    sw.erst.disabled = false;
+    sw.ego.addEventListener("click", sw.start);
+    sw.ego.disabled = false;
+  },
+
+  // (B) TIMER ACTION
+  timer : null, // timer object
+  now : 0, // current elapsed time
+  tick : function () {
+    // (B1) CALCULATE HOURS, MINS, SECONDS
+    sw.now++;
+    var remain = sw.now;
+    var hours = Math.floor(remain / 3600);
+    remain -= hours * 3600;
+    var mins = Math.floor(remain / 60);
+    remain -= mins * 60;
+    var secs = remain;
+
+    // (B2) UPDATE THE DISPLAY TIMER
+    if (hours<10) { hours = "0" + hours; }
+    if (mins<10) { mins = "0" + mins; }
+    if (secs<10) { secs = "0" + secs; }
+    sw.etime.innerHTML = hours + ":" + mins + ":" + secs;
+  },
+
+  // (C) START!
+  start : function () {
+    sw.timer = setInterval(sw.tick, 1000);
+    sw.ego.value = "Stop";
+    sw.ego.removeEventListener("click", sw.start);
+    sw.ego.addEventListener("click", sw.stop);
+  },
+
+  // (D) STOP
+  stop  : function () {
+    clearInterval(sw.timer);
+    sw.timer = null;
+    sw.ego.value = "Start";
+    sw.ego.removeEventListener("click", sw.stop);
+    sw.ego.addEventListener("click", sw.start);
+  },
+
+  // (E) RESET
+  reset : function () {
+    if (sw.timer != null) { sw.stop(); }
+    timeSpent = document.getElementById("timeSpent").innerHTML.split(': ')[1]
+    if(timeSpent == 'None'){
+        timeSpent = Number(0.0)
+    }
+    else{
+        timeSpent = Number(timeSpent)
+    }
+
+    timeSpent+=(sw.now/3600)
+
+    document.getElementById("timeSpent").innerHTML="Time spent: " + timeSpent.toFixed(2);
+    sw.now = -1;
+    sw.tick();
+  }
+};
+window.addEventListener("load", sw.init);
+</script>
+{% endblock %}
 
 <h4 class="title">Story name: {{ story.name }}</h4>
 <form id="new-story-form" method="post" action="" class="col-4">
@@ -24,8 +102,7 @@
         <div>{{task.description}}</div>
         <div>Time cost:
         {{task.timeCost}}</div>
-        <div>Time spent:
-        {{task.time_spent}}</div>
+        <div id="timeSpent">Time spent: {{task.time_spent}}</div>
         <div>Assigned to:
         {{task.assignedUser}}</div>
         {% if task.userConfirmed %}
@@ -36,6 +113,14 @@
                 No</div>
         {% endif %}
         
+    </div>
+    <div id="stopwatch" style="display: flex; flex-wrap: wrap; max-width: 160px; margin: 0 auto;">
+      <!-- CURRENT TIME -->
+      <div id="sw-time" style="width: 100%; padding: 20px 0; font-size: 24px; font-weight: bold; text-align: center; background: #000; color: #fff;">00:00:00</div>
+
+      <!-- CONTROLS -->
+      <input style="box-sizing: border-box; width: 50%; cursor: pointer; padding: 7px 0; border: 0; color: #fff; font-size: 20px; background-color: #a32208;" type="button" value="Done" id="sw-rst" disabled/>
+      <input style="box-sizing: border-box; width: 50%; cursor: pointer; padding: 7px 0; border: 0; color: #fff; font-size: 20px; background-color: #20a308;" type="button" value="Start" id="sw-go" disabled/>
     </div>
 </div>
 {% endfor %}
