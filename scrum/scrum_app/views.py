@@ -18,12 +18,14 @@ import sys
 
 
 def index(request):
+    if request.user.is_authenticated: 
+        user = get_user_model().objects.get(id=request.user.id)
+        projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
 
-    user = get_user_model().objects.get(id=request.user.id)
-    projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
-
-    return render(request, 'home.html', context={'projects': projects,
-                                                  'activate_home':'active'})
+        return render(request, 'home.html', context={'projects': projects,
+                                                    'activate_home':'active'})
+    else:
+        return HttpResponseRedirect('/login')
 
 def project(request):
 
