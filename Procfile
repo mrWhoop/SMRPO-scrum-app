@@ -1,1 +1,1 @@
-web: gunicorn scrum_app.wsgi
+web: gunicorn --pythonpath scrum scrum.wsgi
