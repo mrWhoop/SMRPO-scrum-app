@@ -64,8 +64,12 @@
 	right: 20px;
 }
 
-.card-body div, .card-header div {
+.story_cards .card-body div, .story_cards .card-header div {
 	margin: 10px 0;
+}
+
+.my_tasks_list .card {
+	margin: 7.5px 7.5px;
 }
 
 .main_container .title {

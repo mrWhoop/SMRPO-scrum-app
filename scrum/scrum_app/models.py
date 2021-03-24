@@ -11,6 +11,11 @@ class Project(models.Model):
     # skrbnik metodologije
     scrum_master = models.ForeignKey(User, on_delete=models.CASCADE, related_name='scrum_master')
 
+    def getStories(self):
+        return Story.objects.filter(project_id=self)
+
+    stories = property(getStories)
+
 # dev team member without any special role
 class DevTeamMember(models.Model):
 
@@ -53,6 +58,11 @@ class Story(models.Model):
 
     # do we need to save the state as was after the sprint comlpetion or can we rewire to new sprint in case of rejection
     sprint = models.ForeignKey(Sprint, on_delete=models.CASCADE, null=True)
+
+    def getTasks(self):
+        return Task.objects.filter(story_id=self)
+
+    tasks = property(getTasks)
 
 class Task(models.Model):
 

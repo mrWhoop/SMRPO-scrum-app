@@ -12,11 +12,6 @@ from .models import Sprint, Story, Project, DevTeamMember, Task
 from django.contrib.auth.models import User
 from django.db.models import Q
 
-
-import sys
-
-
-
 def index(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
@@ -277,28 +272,42 @@ def new_sprint_form(request):
 
 
 def my_tasks(request):
+    if request.user.is_authenticated:
+        user = get_user_model().objects.get(id=request.user.id)
 
-    user = get_user_model().objects.get(id=request.user.id)
+        
+        #for project in projects:
+        #    stories = Story.objects.filter(Q(project_id=project))
+        #    for story in stories:
+        #        tasks = Task.objects.filter(Q(story_id=story))
+        #        for task in tasks:
+        #            continue
 
-    
-    #for project in projects:
-    #    stories = Story.objects.filter(Q(project_id=project))
-    #    for story in stories:
-    #        tasks = Task.objects.filter(Q(story_id=story))
-    #        for task in tasks:
-    #            continue
+        #data_projects = { project : { story : Task.objects.filter(Q(story_id=story)) for story in Story.objects.filter(Q(project_id=project)) } for project in projects}
 
-    projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
-    data = { project : { story : Task.objects.filter(Q(story_id=story)) for story in Story.objects.filter(Q(project_id=project)) } for project in projects}
+        #dobil bi rad storyje ločene na projekt
+        #stories = Story.objects.filter(Q(project_id=project))
 
-    #dobil bi rad storyje ločene na projekt
-    #stories = Story.objects.filter(Q(project_id=project))
+        #dobil bi rad taske ločene na story
+        #tasks = Task.objects.filter(Q(story_id=story))
+        #print("OUT: ", data_projects, file=sys.stderr)
 
-    #dobil bi rad taske ločene na story
-    #tasks = Task.objects.filter(Q(story_id=story))
-    print("OUT: ", data, file=sys.stderr)
+        projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
 
-    return render(request, 'my_tasks.html', context={#'tasks': tasks,
-                                                     'data': data,
-                                                     #'stories': stories,
-                                                     'activate_mytasks': 'active'})
+        return render(request, 'my_tasks.html', context={'projects': projects,
+                                                         'activate_mytasks': 'active'})
+    else:
+        return HttpResponseRedirect('/login')
+
+
+
+
+
+
+
+
+
+
+
+
+
