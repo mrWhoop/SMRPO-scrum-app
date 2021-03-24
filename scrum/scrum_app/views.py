@@ -47,7 +47,7 @@ def project(request):
     project_id = request.GET.get('id')
 
     project = Project.objects.get(id=project_id)
-    stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
+    stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc()).order_by('sprint__start')
 
     today = datetime.date.today()
 
