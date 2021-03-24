@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<h4 class="title">Story name: {{ story.name }}</h4>
+<form id="new-story-form" method="post" action="" class="col-4">
+{% csrf_token %}
+{% if sprint_active == True %}
+    <a href="new_task?story_id={{ story.id }}"  class="btn btn-primary ">Add task</a>
+{% else %}
+    <p class="text-danger">
+        Story not part of an active sprint!
+    </p>
+{% endif %}
+<br></br>
+<h5 >Tasks list:</h5>
+
+{% for task in tasks %}
+
+<div class="card story_cards">
+    <div class="card-body">
+        <h5>Description</h5>
+        <div>{{task.description}}</div>
+        <div>Time cost:
+        {{task.timeCost}}</div>
+        <div>Time spent:
+        {{task.time_spent}}</div>
+        <div>Assigned to:
+        {{task.assignedUser}}</div>
+        {% if task.userConfirmed %}
+            <div>User confirmed:
+            Yes</div>
+        {% else %}
+            <div>User confirmed:
+                No</div>
+        {% endif %}
+        
+    </div>
+</div>
+{% endfor %}
+    
+
+</form>
+{% endblock %}

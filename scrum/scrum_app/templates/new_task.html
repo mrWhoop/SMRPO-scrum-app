@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h4 class="title">New task</h4>
+<form id="new-task-form" method="post" 
+action="{% url 'new_task_form' %}" class="col-4">
+    {% csrf_token %}
+    <div class="mb-3">
+		<select hidden class="form-control" name="story" required>
+            <option hidden value="{{ story.id }}">{{ story.id  }}</option>
+        </select>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="description">Description:</label>
+		<textarea class="form-control" rows="5" type="text" name="description" required></textarea>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="time_cost">Time cost:</label>
+		<input placeholder="00.00" class="form-control" maxlength="5" pattern="\d{1,5}\.\d{2}" type="text" type="text" name="time_cost" required>
+	</div>
+	<div class="mb-3">
+        <label class="form-label" for="assignedUser">Assign to:</label>
+		<select class="form-control" name="assignedUser">
+            <option value="Unassigned">Unassigned</option>
+        {% for user in users %}
+            <option value="{{ user.userId }}">{{ user.userId }}</option>
+        {% endfor %}
+        </select>
+	</div>
+    <div class="mb-3"></div>
+    <input type="submit" value="Add task" 
+                       class="btn btn-primary pull-right" />
+    {% if success == True %}
+    </br>
+    <p class="text-success">
+        Task added succesfuly!
+    </p>
+    {% endif %}
+
+</form>
+
+{% endblock %}

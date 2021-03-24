@@ -10,7 +10,6 @@
 
 {% for story in stories %}
 
-
 <div class="card story_cards">
     <div class="card-header">{{story.name}}</div>
     <div class="card-body">
@@ -44,7 +43,7 @@
 
 
             <div class="mb-3">
-                <label class="form-label" for="sprints{{ story.id }}">Availabele sprints:</label>
+                <label class="form-label" for="sprints{{ story.id }}">Available sprints:</label>
                 <select class="form-select" name="sprint_{{ story.id }}"  >
                     <option value="None" hidden></option>
                     {% for sprint in sprints %}
@@ -59,7 +58,12 @@
             {{story.sprint.start}} - {{story.sprint.end}}</div>
 
         {% endif %}
+
+        <a href="story?id={{ story.id }}" style="color:#4F8EC3">Tasks</a>
     </div>
+    
+    
+    
 </div>
 
 

@@ -17,4 +17,6 @@ urlpatterns = [
     url(r'^new_project/$', views.new_project_form, name='new_project_form'),
     url(r'^new_sprint/$', views.new_sprint_form, name='new_sprint_form'),
     url(r'^project/$', views.project, name='project'),
+    url(r'^project/story/$', views.story, name='story'),
+    url(r'^project/story/new_task/$', views.new_task_form, name='new_task_form'),
 ]

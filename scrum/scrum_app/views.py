@@ -8,11 +8,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.contrib.auth.forms import  AuthenticationForm
 from django.contrib.auth import get_user_model
-from .models import Sprint, Story, Project, DevTeamMember
+from .models import Sprint, Story, Project, DevTeamMember, Task
 from django.contrib.auth.models import User
 from django.db.models import Q
 
+
 import sys
+
+
 
 def index(request):
 
@@ -52,6 +55,20 @@ def project(request):
 
     return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active'})
 
+def story(request):
+
+    story_id = request.GET.get('id')
+    story = Story.objects.get(id=story_id)
+    tasks = Task.objects.filter(story=story)
+    sprint = story.sprint
+    sprint_active = True
+   
+    utc = pytz.UTC
+    if sprint == None or utc.localize(datetime.datetime.today()) > sprint.end:
+        sprint_active = False
+
+    return render(request,'story.html', context={'story':story,'tasks':tasks, 'sprint_active':sprint_active})
+
 def new_story_form(request):
     users =  get_user_model().objects.all()
     #print("OUT: ", story, file=sys.stderr)
@@ -61,9 +78,9 @@ def new_story_form(request):
     name_exists = False
 
     if request.method == 'POST':
-        story_name = request.POST["story_name"];
-        story_description = request.POST["story_description"];
-        story_priority = request.POST["story_priority"];
+        story_name = request.POST["story_name"]
+        story_description = request.POST["story_description"]
+        story_priority = request.POST["story_priority"]
         story_bussines_value = request.POST["story_bussines_value"]
         time_cost = request.POST["time_cost"]
         # time_spent = request.POST["time_spent"]
@@ -133,6 +150,30 @@ def new_project_form(request):
                               'success': success,
                               'name_exists':name_exists
                               })
+
+def new_task_form(request):
+    
+  
+    if request.method == 'POST':
+        story_id = request.POST["story"]
+        story = Story.objects.get(id=story_id)
+        timeCost = request.POST["time_cost"]
+        description = request.POST["description"]
+        assignedUser = request.POST["assignedUser"]
+        user = None
+        if assignedUser != "Unassigned":
+            user = User.objects.get(username=assignedUser)
+        task = Task(story=story,  description=description,timeCost=timeCost,assignedUser=user,userConfirmed=False)
+        task.save()
+        return HttpResponseRedirect('/project/story/?id='+story_id)
+    else:
+        story_id = request.GET.get('story_id')
+        story = Story.objects.get(id=story_id)
+        project = story.project
+        sprint = story.sprint
+        dev_team_members = DevTeamMember.objects.filter(projectId=project)
+        return render(request, "new_task.html", context={'users':dev_team_members, 'story':story })
+        
 
 def login_user(request):
     if request.method == 'POST':
