@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-# import django_heroku
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +26,7 @@ SECRET_KEY = 'hrb1x_ovc9%f=56)w$ky!e#@s%ls%j9--&-v0x$wd@04=f=gn@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['scrum-app987.herokuapp.com']
 
 
 # Application definition
@@ -130,4 +130,4 @@ STATIC_URL = '/static/'
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
 
-# django_heroku.settings(locals())
+django_heroku.settings(locals())
