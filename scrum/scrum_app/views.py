@@ -17,7 +17,8 @@ import sys
 def index(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
-        projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
+
+        projects = {Project.objects.get(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
 
         return render(request, 'home.html', context={'projects': projects,
                                                     'activate_home':'active'})
@@ -91,7 +92,7 @@ def new_story_form(request):
             comment = request.POST['comment']
             story_status = request.POST['story_status']
             project = request.POST['project']
-            sprint = request.POST['sprint'] if request.POST['sprint'] else None
+            # sprint = request.POST['sprint'] if request.POST['sprint'] else None
 
             if time_cost == '':
                 time_cost = None
@@ -111,7 +112,8 @@ def new_story_form(request):
                             comment=comment,
                             developmentStatus=story_status,
                             project_id=project,
-                            sprint_id=sprint)
+                            # sprint_id=sprint
+                            )
                 story.save()
                 success = not success
 
@@ -294,7 +296,7 @@ def my_tasks(request):
 
         #dev = DevTeamMember.objects.filter(userId_id=user)
 
-        #projects = 
+        #projects =
 
         #projects_dev = DevTeamMember.objects.projects
 
