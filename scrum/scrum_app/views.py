@@ -12,6 +12,8 @@ from .models import Sprint, Story, Project, DevTeamMember, Task
 from django.contrib.auth.models import User
 from django.db.models import Q
 
+import sys
+
 def index(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
@@ -25,8 +27,6 @@ def index(request):
 def project(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-
-            print("OUT: ", list(request.POST.items()), file=sys.stderr)
 
             for name, value in request.POST.items():
                 if name == 'csrfmiddlewaretoken':
@@ -74,7 +74,6 @@ def new_story_form(request):
 
     if request.user.is_authenticated:
         users =  get_user_model().objects.all()
-        #print("OUT: ", story, file=sys.stderr)
         projects = Project.objects.all()
         sprints = Sprint.objects.all()
         success = False
@@ -290,14 +289,47 @@ def my_tasks(request):
 
         #dobil bi rad taske ločene na story
         #tasks = Task.objects.filter(Q(story_id=story))
-        #print("OUT: ", data_projects, file=sys.stderr)
 
-        projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
+        #print("OUT: ", list(request.POST.items()), file=sys.stderr)
+
+        #dev = DevTeamMember.objects.filter(userId_id=user)
+
+        #projects = 
+
+        #projects_dev = DevTeamMember.objects.projects
+
+        #dodat da si developer
+
+        #projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
+        #projects = Project.objects.filter(Q(id=dev))
+        #projects = Project.objects.filter(id=dev)
+
+        projects = {Project.objects.get(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
 
         return render(request, 'my_tasks.html', context={'projects': projects,
                                                          'activate_mytasks': 'active'})
     else:
         return HttpResponseRedirect('/login')
+
+
+def update_task_asign(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            task_id = request.POST['task_id']
+            userConfirmed = request.POST['userConfirmed']
+
+            #print("OUT: ", userConfirmed, file=sys.stderr)
+
+            task = Task.objects.get(id=int(task_id))
+            if userConfirmed == "Accept":
+                task.userConfirmed =  True
+                task.assignedUser_id = get_user_model().objects.get(id=request.user.id)
+            else:
+                task.userConfirmed = False
+                task.assignedUser_id = None
+            task.save()
+
+    return HttpResponse(task_id)
 
 
 
