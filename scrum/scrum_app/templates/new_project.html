@@ -8,7 +8,7 @@ action="{% url 'new_project_form' %}" class="col-4">
     {% csrf_token %}
 	<div class="mb-3">
 		<label class="form-label" for="project_name">Name:</label>
-		<input class="form-control" type="text" name="project_name">
+		<input class="form-control" type="text" name="project_name" required>
         {% if name_exists == True %}
             <p class="text-danger">
                 Project name already exists!
