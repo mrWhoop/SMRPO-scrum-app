@@ -14,26 +14,39 @@
 
 	    		{% if story.tasks %}
 
-		    		<div class="card float-start">
+		    		<div class="card float-start col-2">
 		    			<div class="card-header">
 		    				Story: {{ story.name }}
 		    			</div>
 		    			<div class="card-body">
 			    				{% for task in story.tasks %}
-			    				<div class="card">
-					    			<div class="card-body">
-					    				<div>
-					    					Task: {{ task.description }}<br>
-					    				</div>
-										<div>
-					    					Time cost: {{ task.timeCost }}<br>
-					    				</div>
-					    				<br>
-					    				<div class="btn btn-success">Accept</div>
-					    				<div class="btn btn-danger">Reject</div>
-					    			</div>
-					    		</div>
+
+			    				{% if user.id == task.assignedUser_id or not task.userConfirmed %}
+
+				    				<div class="card">
+						    			<div class="card-body">
+						    				<div>
+						    					Task: {{ task.description }}<br>
+						    				</div>
+											<div class="mb-2">
+						    					Time cost: {{ task.timeCost }}<br>
+						    				</div>
+						    				<div class="row">
+						    					<div class="col">
+						    						<div style="cursor: initial;" data-value="{{ task.id }}" class="task_{{ task.id }} text-success btn {% if user.id != task.assignedUser_id %} d-none {% endif %}">Accepted</div>
+						    						<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-success {% if task.userConfirmed %} d-none {% endif %}">Accept</div>
+						    					</div>
+						    					<div class="col">
+						    						<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if not task.userConfirmed %} d-none {% endif %}">Reject</div>
+						    					</div>
+						    				</div>
+						    			</div>
+						    		</div>
+
+						    	{% endif %}
+
 					    		{% endfor %}
+
 		    			</div>
 		    		</div>
 
@@ -44,4 +57,27 @@
 	</div>
 	{% endfor %}
 </div>
+
+
+<script type="text/javascript">
+	var token = '{{csrf_token}}';
+
+	$(".my_tasks_list .btn_click").click(function() {
+
+		var task_id = $(this).data("value");
+		var userConfirmed = $(this).text();
+
+		$.ajax({
+			type: "POST",
+			headers: { "X-CSRFToken":  token },
+			url: "/ajax/task/asignupdate/",
+			data : {task_id: task_id, userConfirmed: userConfirmed}
+		}).done(function(result) {
+			$(".task_"+result).toggleClass("d-none");
+		});
+
+	});
+	
+</script>
+
 {% endblock %}

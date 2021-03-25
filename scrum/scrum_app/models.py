@@ -14,6 +14,9 @@ class Project(models.Model):
     def getStories(self):
         return Story.objects.filter(project_id=self)
 
+    def getDevTeamMembers(self):
+        return DevTeamMember.objects.filter(projectId_id=self)
+
     stories = property(getStories)
 
 # dev team member without any special role
@@ -22,6 +25,11 @@ class DevTeamMember(models.Model):
     userId = models.ForeignKey(User, on_delete=models.CASCADE)
 
     projectId = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    def getProjects(self):
+        return Projects.objects.filter(id=self)
+
+    projects = property(getProjects)
 
 class Sprint(models.Model):
 
