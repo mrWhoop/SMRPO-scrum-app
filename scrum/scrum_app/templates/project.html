@@ -3,6 +3,10 @@
 {% block content %}
 
 <h4 class="title">Project name: {{ project.projectName }}</h4>
+
+<h6>Product owner: {{project.product_owner}}</h6>
+<h6>Scrum Master: {{project.scrum_master}}</h6><br>
+
 <form id="new-project-form" method="post" action="" class="col-4">
 {% csrf_token %}
 
@@ -32,17 +36,17 @@
         <div class="mb-3">
             <div>
                 <label class="form-label" for="time_cost">Estimated time:</label>
-                <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
+                <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">h
             </div>
         </div>
         {% else %}
-        Time cost: {{ story.timeCost }}
+        Time cost: {{ story.timeCost }} h
         {% endif %}
 
 
 
         <div>Time spent:
-        {{story.timeSpent}}</div>
+        {{story.timeSpent}} h</div>
         <div>Comment:
         {{story.comment}}</div>
         <div>Development status:
