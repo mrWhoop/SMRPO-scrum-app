@@ -11,6 +11,8 @@ class Project(models.Model):
     # skrbnik metodologije
     scrum_master = models.ForeignKey(User, on_delete=models.CASCADE, related_name='scrum_master')
 
+    description = models.TextField()
+
     def getStories(self):
         return Story.objects.filter(project_id=self)
 

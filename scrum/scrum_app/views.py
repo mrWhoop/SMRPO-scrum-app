@@ -269,7 +269,8 @@ def new_sprint_form(request):
         minEndDate = (datetime.date.today() + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
         minStartDate = datetime.date.today().strftime("%Y-%m-%d")
 
-        projects = projects = Project.objects.all()
+        user = get_user_model().objects.get(id=request.user.id)
+        projects = Project.objects.filter(scrum_master=user)
 
         if request.method == 'POST':
             project_id = request.POST['project']
