@@ -50,15 +50,17 @@ def project(request):
 
         sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
 
+        velocityLeft = 0
         if len(sprints) < 1:
             sprints = None
         else:
             sprints = sprints[0]
 
-        velocityLeft = sprints.expectedSpeed
-        sprintStories = Story.objects.filter(sprint=sprints)
-        for story in sprintStories:
-            velocityLeft -= story.timeCost
+            velocityLeft = sprints.expectedSpeed
+            sprintStories = Story.objects.filter(sprint=sprints)
+            for story in sprintStories:
+                velocityLeft -= story.timeCost
+
 
         if request.method == 'POST':
 
@@ -87,12 +89,6 @@ def project(request):
                     StoryObject = Story.objects.get(id=int(story_id))
                     StoryObject.sprint_id = value
                     StoryObject.save()
-
-
-        velocityLeft = sprints.expectedSpeed
-        sprintStories = Story.objects.filter(sprint=sprints)
-        for story in sprintStories:
-            velocityLeft -= story.timeCost
 
         return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner})
     else:
