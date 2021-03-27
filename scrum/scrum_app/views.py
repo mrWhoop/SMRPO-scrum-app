@@ -33,7 +33,46 @@ def index(request):
 
 def project(request):
     if request.user.is_authenticated:
+
+        project_id = request.GET.get('id')
+
+        project = Project.objects.get(id=project_id)
+
+        notProductOwner = True
+        # check product owner
+        if project.product_owner_id == request.user.id:
+            notProductOwner = False
+
+        stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
+
+        today = datetime.date.today()
+
+        sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
+
+        if len(sprints) < 1:
+            sprints = None
+        else:
+            sprints = sprints[0]
+
+        velocityLeft = sprints.expectedSpeed
+        sprintStories = Story.objects.filter(sprint=sprints)
+        for story in sprintStories:
+            velocityLeft -= story.timeCost
+
         if request.method == 'POST':
+
+            velocityCheck = velocityLeft
+            for name, value in request.POST.items():
+                if name == 'csrfmiddlewaretoken':
+                    continue
+                field, story_id = name.split("_")
+                if field == 'sprint' and value != 'None':
+                    StoryObject = Story.objects.get(id=int(story_id))
+                    velocityCheck -= StoryObject.timeCost
+                    if velocityCheck < 0:
+                        return render(request, 'project.html',
+                                      context={'project': project, 'stories': stories, 'sprints': sprints,
+                                               'activate_home': 'active', 'velocityLeft': velocityLeft, 'velocityExceeded': True, 'notProductOwner': notProductOwner})
 
             for name, value in request.POST.items():
                 if name == 'csrfmiddlewaretoken':
@@ -48,20 +87,13 @@ def project(request):
                     StoryObject.sprint_id = value
                     StoryObject.save()
 
-        project_id = request.GET.get('id')
 
-        project = Project.objects.get(id=project_id)
-        stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
+        velocityLeft = sprints.expectedSpeed
+        sprintStories = Story.objects.filter(sprint=sprints)
+        for story in sprintStories:
+            velocityLeft -= story.timeCost
 
-        today = datetime.date.today()
-
-        sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
-        if len(sprints) < 1:
-            sprints = None
-        else:
-            sprints = sprints[0]
-
-        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active'})
+        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner})
     else:
         return HttpResponseRedirect('/login')
 
