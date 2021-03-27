@@ -34,7 +34,7 @@
 						    				<div class="row">
 						    					<div class="col">
 						    						<div style="cursor: initial;" data-value="{{ task.id }}" class="task_{{ task.id }} text-success btn {% if user.id != task.assignedUser_id %} d-none {% endif %}">Accepted</div>
-						    						<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-success {% if task.userConfirmed == 'accept' %} d-none {% endif %}">Accept</div>
+						    						<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-success {% if task.userConfirmed == 'accepted'   %} d-none {% endif %}">Accept</div>
 						    					</div>
 						    					<div class="col">
 						    						<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if task.userConfirmed == 'free' or task.userConfirmed == 'rejected' %} d-none {% endif %}">Reject</div>
