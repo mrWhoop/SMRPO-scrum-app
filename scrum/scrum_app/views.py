@@ -119,9 +119,9 @@ def story(request):
 def new_story_form(request):
 
     if request.user.is_authenticated:
-        users =  get_user_model().objects.all()
-        projects = Project.objects.all()
-        sprints = Sprint.objects.all()
+        user = user = get_user_model().objects.get(id=request.user.id)
+        projects = Project.objects.filter(product_owner=user)
+        # sprints = Sprint.objects.all()
         success = False
         name_exists = False
 
@@ -130,17 +130,17 @@ def new_story_form(request):
             story_description = request.POST["story_description"]
             story_priority = request.POST["story_priority"]
             story_bussines_value = request.POST["story_bussines_value"]
-            time_cost = request.POST["time_cost"]
+            # time_cost = request.POST["time_cost"]
             # time_spent = request.POST["time_spent"]
             # asignee = request.POST["asignee"]
             # user_confirmed = request.POST.get('user_confirmed', "") == "on"
             comment = request.POST['comment']
-            story_status = request.POST['story_status']
+            # story_status = request.POST['story_status']
             project = request.POST['project']
             # sprint = request.POST['sprint'] if request.POST['sprint'] else None
 
-            if time_cost == '':
-                time_cost = None
+            # if time_cost == '':
+            #     time_cost = None
 
             try:
                 Story.objects.get(name=story_name, project_id=int(project))
@@ -150,12 +150,12 @@ def new_story_form(request):
                             description=story_description,
                             priority=story_priority,
                             businessValue=story_bussines_value,
-                            timeCost=time_cost,
+                            #timeCost=time_cost,
                             # timeSpent=time_spent,
                             # assignedUser_id=asignee,
                             # userConfirmed=user_confirmed,
                             comment=comment,
-                            developmentStatus=story_status,
+                            developmentStatus='new',
                             project_id=project,
                             # sprint_id=sprint
                             )
@@ -164,10 +164,10 @@ def new_story_form(request):
 
         return render(request,    'new_story.html',
                     context={   'activate_newstory': 'active',
-                                'users': users,
+                                # 'users': users,
                                 'projects': projects,
                                 'success': success,
-                                'sprints': sprints,
+                                # 'sprints': sprints,
                                 'name_exists':name_exists
                                 })
     else:
@@ -222,9 +222,11 @@ def new_task_form(request):
             description = request.POST["description"]
             assignedUser = request.POST["assignedUser"]
             user = None
+            userConfirmed = 'free'
             if assignedUser != "Unassigned":
                 user = User.objects.get(username=assignedUser)
-            task = Task(story=story,  description=description,timeCost=timeCost,assignedUser=user,userConfirmed=False)
+                userConfirmed = 'pending'
+            task = Task(story=story,  description=description,timeCost=timeCost,assignedUser=user,userConfirmed=userConfirmed)
             task.save()
             return HttpResponseRedirect('/project/story/?id='+story_id)
         else:
@@ -378,10 +380,10 @@ def update_task_asign(request):
 
             task = Task.objects.get(id=int(task_id))
             if userConfirmed == "Accept":
-                task.userConfirmed =  True
+                task.userConfirmed = 'accepted'
                 task.assignedUser_id = get_user_model().objects.get(id=request.user.id)
             else:
-                task.userConfirmed = False
+                task.userConfirmed = 'rejected'
                 task.assignedUser_id = None
             task.save()
 

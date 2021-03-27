@@ -86,4 +86,5 @@ class Task(models.Model):
 
     assignedUser = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
-    userConfirmed = models.BooleanField(default=False)
+    # accepted, rejected, pending, free
+    userConfirmed = models.TextField()

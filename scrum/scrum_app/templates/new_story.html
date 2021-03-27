@@ -31,12 +31,14 @@ action="{% url 'new_story_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="story_bussines_value">Bussines value:</label>
-		<input class="form-control" type="number" name="story_bussines_value" required>
+		<input class="form-control" type="number" name="story_bussines_value" min="1" max="10" required>
 	</div>
+	<!---
 	<div class="mb-3">
 		<label class="form-label" for="time_cost">Time cost:</label>
 		<input placeholder="00.00" class="form-control" maxlength="5" pattern="\d{1,5}\.\d{1,2}" type="text" type="text" name="time_cost">
 	</div>
+	--!>
 	<!--
 	<div class="mb-3">
 		<label class="form-label" for="time_spent">Time spent:</label>
@@ -62,10 +64,11 @@ action="{% url 'new_story_form' %}" class="col-4">
 		<label class="form-label" for="comment">Comment:</label>
 		<textarea class="form-control" rows="5" type="textfield" name="comment"></textarea>
 	</div>
+	<!--
 	<div class="mb-3">
 		<label class="form-label" for="story_status">Status:</label>
 		<select class="form-control" name="story_status" required>
-			<!--option value=""></option-->
+			<option value=""></option>
 			<option value="new">New</option>
 			<option value="in_progress">In progress</option>
 			<option value="done">Done</option>
@@ -74,6 +77,7 @@ action="{% url 'new_story_form' %}" class="col-4">
 			<option value="incomplete">Incomplete</option>
 		</select>
 	</div>
+	--!>
 	<div class="mb-3">
 		<label class="form-label" for="project">Project:</label>
 		<select class="form-control" name="project" required>

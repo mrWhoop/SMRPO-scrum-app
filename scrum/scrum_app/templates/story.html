@@ -91,7 +91,7 @@ window.addEventListener("load", sw.init);
         Story not part of an active sprint!
     </p>
 {% endif %}
-<br></br>
+<br>
 <h5 >Tasks list:</h5>
 
 
@@ -103,7 +103,7 @@ window.addEventListener("load", sw.init);
       <th scope="col" class="col-2">Time cost (h)</th>
       <th scope="col" class="col-2">Time spent (h)</th>
       <th scope="col" class="col-2">Assigned to</th>
-      <th scope="col" class="col-2">User confirmed</th>
+      <th scope="col" class="col-2">Confirmation status</th>
     </tr>
   </thead>
   <tbody>
@@ -114,11 +114,7 @@ window.addEventListener("load", sw.init);
       <td class="col-2">{{task.timeCost}}</td>
       <td class="col-2">{{task.time_spent}}</td>
       <td class="col-2">{{task.assignedUser}}</td>
-      {% if task.userConfirmed %}
-            <td class="col-2">Yes</td>
-        {% else %}
-            <td class="col-2">No</td>
-        {% endif %}
+      <td class="col-2">{{task.userConfirmed}}</td>
     </tr>
     {% endfor %}
   </tbody>
