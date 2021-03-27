@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.contrib.auth.forms import  AuthenticationForm
 from django.contrib.auth import get_user_model
-from .models import Sprint, Story, Project, DevTeamMember, Task
+from .models import Sprint, Story, Project, DevTeamMember, Task, LastLogin
 from django.contrib.auth.models import User
 from django.db.models import Q
 
@@ -17,6 +17,8 @@ import sys
 def index(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
+        lastLogin = LastLogin.objects.get(user_id=request.user.id)
+        lastLogin = lastLogin.lastLoginTime
         projects_devs_qs = {Project.objects.filter(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
         projects_devs = []
         for project_dev in projects_devs_qs:
@@ -28,7 +30,8 @@ def index(request):
                 projects.append(project[0])
         projects = list(set(projects_devs) | set(projects))
         return render(request, 'home.html', context={'projects': projects,
-                                                    'activate_home':'active'})
+                                                    'activate_home':'active',
+                                                     'lastLogin': lastLogin})
     else:
         return HttpResponseRedirect('/login')
 
@@ -256,7 +259,16 @@ def login_user(request):
     return render(request, "login.html", {'form':form})
 
 def logout_user(request):
+
+    user = User.objects.get(id=request.user.id)
+    print(user)
+    lastLogin, sth = LastLogin.objects.get_or_create(user_id=request.user.id)
+
+    lastLogin.lastLoginTime = user.last_login
+    lastLogin.save()
+
     logout(request)
+
     return HttpResponseRedirect('/login/')  
 
 def new_sprint_form(request):
