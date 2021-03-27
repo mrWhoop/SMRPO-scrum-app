@@ -27,7 +27,7 @@ class DevTeamMember(models.Model):
     projectId = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     def getProjects(self):
-        return Projects.objects.filter(id=self)
+        return Project.objects.filter(id=self)
 
     projects = property(getProjects)
 
