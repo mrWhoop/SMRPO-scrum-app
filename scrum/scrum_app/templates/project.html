@@ -28,6 +28,8 @@
                 <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
             </div>
         </div>
+        {% else %}
+        Time cost: {{ story.timeCost }}
         {% endif %}
 
 
@@ -43,13 +45,7 @@
 
 
             <div class="mb-3">
-                <label class="form-label" for="sprints{{ story.id }}">Available sprints:</label>
-                <select class="form-select" name="sprint_{{ story.id }}"  >
-                    <option value="None" hidden></option>
-                    {% for sprint in sprints %}
-                    <option value="{{ sprint.id }}" > {{ sprint.start }} - {{sprint.end}} </option>
-                    {% endfor %}
-                </select>
+                <input type="checkbox" name="sprint_{{ story.id }}" value="Add to current Sprint">
             </div>
 
         {% else %}

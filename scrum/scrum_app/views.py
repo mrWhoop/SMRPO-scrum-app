@@ -56,6 +56,10 @@ def project(request):
         today = datetime.date.today()
 
         sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
+        if len(sprints) < 1:
+            sprints = None
+        else:
+            sprints = sprints[0]
 
         return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active'})
     else:
@@ -230,18 +234,18 @@ def new_sprint_form(request):
         success = False
         start_overlapping = False
         startBigger = False
-        minEndDate = (datetime.date.today() + datetime.timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S")
-        minStartDate = datetime.date.today().strftime("%Y-%m-%dT%H:%M:%S")
+        minEndDate = (datetime.date.today() + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+        minStartDate = datetime.date.today().strftime("%Y-%m-%d")
 
         projects = projects = Project.objects.all()
 
         if request.method == 'POST':
             project_id = request.POST['project']
             start = request.POST['start']
-            start = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M')
+            start = datetime.datetime.strptime(start, '%Y-%m-%d')
             start = utc.localize(start)
             end = request.POST['end']
-            end = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M')
+            end = datetime.datetime.strptime(end, '%Y-%m-%d')
             end = utc.localize(end)
             speed = request.POST['speed']
             # get all sprints on a project and check end date against starting date
@@ -249,7 +253,7 @@ def new_sprint_form(request):
             sprints = Sprint.objects.filter(project=project)
             for sprint in sprints:
                 sprintEnd = sprint.end
-                if sprintEnd > start:
+                if sprintEnd >= start:
                     start_overlapping = True
                     return render(request, 'new_sprint.html', context={'projects': projects,
                                                                     'minStartDate': minStartDate,

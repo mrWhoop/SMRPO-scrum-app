@@ -17,7 +17,7 @@ action="{% url 'new_sprint_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="start">Starting on:</label>
-		<input class="form-control" type="datetime-local" name="start" min="{{minStartDate}}" required>
+		<input class="form-control" type="date" name="start" min="{{minStartDate}}" required>
         {% if startDateOverlapping == True %}
         </br>
         <p class="text-success">
@@ -33,10 +33,10 @@ action="{% url 'new_sprint_form' %}" class="col-4">
 	</div>
 	<div class="mb-3">
         <label class="form-label" for="end">Ending on:</label>
-		<input class="form-control" type="datetime-local" name="end" min="{{minEndDate}}" required>
+		<input class="form-control" type="date" name="end" min="{{minEndDate}}" required>
 	</div>
 	<div class="mb-3">
-		<label class="form-label" for="speed">Expected speed:</label>
+		<label class="form-label" for="speed">Velocity:</label>
 		<input class="form-control" type="number" name="speed" value="{{speedField}}" required>
 	</div>
     <div class="mb-3"></div>
