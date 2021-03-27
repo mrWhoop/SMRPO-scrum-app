@@ -38,6 +38,11 @@ action="{% url 'new_project_form' %}" class="col-4">
             <option value="{{ user.username }}" selected="selected">{{ user.username }}</option>
         {% endfor %}
         </select>
+        {% if dev_and_product_own == True %}
+            <p class="text-danger">
+                Product owner cannot be developer!
+            </p>
+        {% endif %}
 	</div>
     <div class="mb-3"></div>
     <input type="submit" value="Add project" 

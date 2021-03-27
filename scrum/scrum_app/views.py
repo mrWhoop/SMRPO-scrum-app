@@ -17,9 +17,15 @@ import sys
 def index(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
-
-        projects = {Project.objects.get(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
-
+        projects_devs_qs = {Project.objects.filter(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
+        projects_devs = []
+        for project_dev in projects_devs_qs:
+            projects_devs.append(project_dev[0])
+        projects_qs = {Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user) )}
+        projects =[]
+        for project in projects_qs:
+            projects.append(project[0])
+        projects = list(set(projects_devs) | set(projects))
         return render(request, 'home.html', context={'projects': projects,
                                                     'activate_home':'active'})
     else:
@@ -57,6 +63,7 @@ def project(request):
 
 def story(request):
     if request.user.is_authenticated:
+        user_is_product_owner = False
         story_id = request.GET.get('id')
         story = Story.objects.get(id=story_id)
         tasks = Task.objects.filter(story=story)
@@ -66,8 +73,13 @@ def story(request):
         utc = pytz.UTC
         if sprint == None or utc.localize(datetime.datetime.today()) > sprint.end:
             sprint_active = False
+        
+        project = story.project
+        product_owner = project.product_owner
+        if request.user == product_owner:
+            user_is_product_owner = True
 
-        return render(request,'story.html', context={'story':story,'tasks':tasks, 'sprint_active':sprint_active})
+        return render(request,'story.html', context={'story':story,'tasks':tasks, 'sprint_active':sprint_active,'user_is_product_owner':user_is_product_owner})
     else:
         return HttpResponseRedirect('/login')
 
@@ -133,28 +145,35 @@ def new_project_form(request):
         users =  get_user_model().objects.all()
         success = False
         name_exists = False
+        dev_and_product_own = False
         if request.method == 'POST':
             project_name =request.POST["project_name"]
             product_owner = request.POST["product_owner"]
             product_owner = User.objects.get(username=product_owner)
             scrum_master = request.POST["scrum_master"]
             scrum_master = User.objects.get(username=scrum_master)
-            project, created = Project.objects.get_or_create(projectName=project_name, product_owner=product_owner, scrum_master=scrum_master)
-            if created == False:
+            projects = Project.objects.filter(projectName__iexact=project_name)
+            if len(projects) > 0:
                 name_exists = True
-            else:
-                project.save()
-                for dev_team_member in request.POST.getlist("developers"):
-                    user = User.objects.get(username=dev_team_member)
-                    dev_team_member = DevTeamMember(userId=user, projectId=project)
-                    dev_team_member.save()
-                success = True
+                
+            if name_exists == False:
+                project = Project(projectName=project_name, product_owner=product_owner, scrum_master=scrum_master)
+                if request.POST["product_owner"] not in request.POST.getlist("developers"):
+                    project.save()
+                    for dev_team_member in request.POST.getlist("developers"):
+                        user = User.objects.get(username=dev_team_member)
+                        dev_team_member = DevTeamMember(userId=user, projectId=project)
+                        dev_team_member.save()   
+                        success = True
+                else:
+                    dev_and_product_own = True 
 
         return render(request,    'new_project.html',
                     context={   'activate_newproject':'active',
                                 'users':users,
                                 'success': success,
-                                'name_exists':name_exists
+                                'name_exists':name_exists,
+                                'dev_and_product_own':dev_and_product_own
                                 })
     else:
         return HttpResponseRedirect('/login')
