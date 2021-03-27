@@ -24,7 +24,8 @@ def index(request):
         projects_qs = {Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user) )}
         projects =[]
         for project in projects_qs:
-            projects.append(project[0])
+            if len(project) > 0:
+                projects.append(project[0])
         projects = list(set(projects_devs) | set(projects))
         return render(request, 'home.html', context={'projects': projects,
                                                     'activate_home':'active'})
@@ -188,12 +189,13 @@ def new_project_form(request):
             product_owner = User.objects.get(username=product_owner)
             scrum_master = request.POST["scrum_master"]
             scrum_master = User.objects.get(username=scrum_master)
+            description = request.POST["description"]
             projects = Project.objects.filter(projectName__iexact=project_name)
             if len(projects) > 0:
                 name_exists = True
                 
             if name_exists == False:
-                project = Project(projectName=project_name, product_owner=product_owner, scrum_master=scrum_master)
+                project = Project(projectName=project_name, product_owner=product_owner, scrum_master=scrum_master,description=description)
                 if request.POST["product_owner"] not in request.POST.getlist("developers"):
                     project.save()
                     for dev_team_member in request.POST.getlist("developers"):
