@@ -47,6 +47,7 @@ def project(request):
         project = Project.objects.get(id=project_id)
 
         notProductOwner = True
+        isScrumMaster = project.scrum_master_id == request.user.id
         # check product owner
         if project.product_owner_id == request.user.id:
             notProductOwner = False
@@ -82,7 +83,7 @@ def project(request):
                     if velocityCheck < 0:
                         return render(request, 'project.html',
                                       context={'project': project, 'stories': stories, 'sprints': sprints,
-                                               'activate_home': 'active', 'velocityLeft': velocityLeft, 'velocityExceeded': True, 'notProductOwner': notProductOwner})
+                                               'activate_home': 'active', 'velocityLeft': velocityLeft, 'velocityExceeded': True, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster})
 
             for name, value in request.POST.items():
                 if name == 'csrfmiddlewaretoken':
@@ -97,7 +98,7 @@ def project(request):
                     StoryObject.sprint_id = value
                     StoryObject.save()
 
-        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner})
+        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster})
     else:
         return HttpResponseRedirect('/login')
 
