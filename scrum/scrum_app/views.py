@@ -71,20 +71,7 @@ def project(request):
 
 
         if request.method == 'POST':
-
             velocityCheck = velocityLeft
-            for name, value in request.POST.items():
-                if name == 'csrfmiddlewaretoken':
-                    continue
-                field, story_id = name.split("_")
-                if field == 'sprint' and value != 'None':
-                    StoryObject = Story.objects.get(id=int(story_id))
-                    velocityCheck -= StoryObject.timeCost
-                    if velocityCheck < 0:
-                        return render(request, 'project.html',
-                                      context={'project': project, 'stories': stories, 'sprints': sprints,
-                                               'activate_home': 'active', 'velocityLeft': velocityLeft, 'velocityExceeded': True, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster})
-
             for name, value in request.POST.items():
                 if name == 'csrfmiddlewaretoken':
                     continue
@@ -93,8 +80,15 @@ def project(request):
                     StoryObject = Story.objects.get(id=int(story_id))
                     StoryObject.timeCost = value
                     StoryObject.save()
+
                 if field == 'sprint' and value != 'None':
                     StoryObject = Story.objects.get(id=int(story_id))
+                    velocityCheck -= StoryObject.timeCost
+                    if velocityCheck < 0:
+                        return render(request, 'project.html',
+                                      context={'project': project, 'stories': stories, 'sprints': sprints,
+                                               'activate_home': 'active', 'velocityLeft': velocityLeft, 'velocityExceeded': True, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster})
+
                     StoryObject.sprint_id = value
                     StoryObject.save()
 

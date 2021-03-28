@@ -32,7 +32,7 @@
         {{story.businessValue}}</div>
 
 
-        {% if story.sprint == None and notProductOwner and isScrumMaster %}
+        {% if story.sprint == None and isScrumMaster %}
         <div class="mb-3">
             <div>
                 <label class="form-label" for="time_cost">Estimated time:</label>
@@ -57,7 +57,7 @@
 
             <div class="mb-3">
                 <label for="sprint_{{ story.id }}">Add to current sprint (Velocity:{{ sprints.expectedSpeed }}; Still available: {{ velocityLeft }})</label><br>
-                <input type="checkbox" name="sprint_{{ story.id }}" value="{{ sprints.id }}" style="width:30px; height:30px;">
+                <input class="mt-1" type="checkbox" name="sprint_{{ story.id }}" value="{{ sprints.id }}" style="width:30px; height:30px;">
             </div>
 
         {% else %}
