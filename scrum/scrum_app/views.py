@@ -17,8 +17,12 @@ import sys
 def index(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
-        lastLogin = LastLogin.objects.get(user_id=request.user.id)
-        lastLogin = lastLogin.lastLoginTime
+        last_login_time = user.last_login
+        try:
+            lastLogin = LastLogin.objects.get(user_id=request.user.id)
+            last_login_time = lastLogin.lastLoginTime
+        except:
+            pass
         projects_devs_qs = {Project.objects.filter(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
         projects_devs = []
         for project_dev in projects_devs_qs:
@@ -31,7 +35,7 @@ def index(request):
         projects = list(set(projects_devs) | set(projects))
         return render(request, 'home.html', context={'projects': projects,
                                                     'activate_home':'active',
-                                                     'lastLogin': lastLogin})
+                                                     'lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login')
 
