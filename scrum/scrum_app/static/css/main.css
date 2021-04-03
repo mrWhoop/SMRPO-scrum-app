@@ -77,3 +77,9 @@
 	padding-bottom: 25px;
 	margin-bottom: 20px;
 }
+
+.sticky{
+	position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}

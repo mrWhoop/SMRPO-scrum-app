@@ -2,82 +2,167 @@
 {% load static %}
 {% block content %}
 
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#new-post-form").submit(function(e){
+            e.preventDefault()
+
+            var serializedData = $(this).serialize();
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'new_post_form'%}",
+                data: serializedData,
+                success: function (response){
+                    $("#new-post-form").trigger('reset');
+                    console.log(response);
+                   $("#post_cards").prepend(
+                        `<div class="card story_cards" >
+                            <div class="card-header">${response.username}
+                                <p class="card-text topnav-right">${response.time_posted}</p>
+                            </div>
+                            <div class="card-body text-dark">
+                            <p class="card-text">${response.description}</p>
+                            </div>
+                        </div>
+                        `
+                    )
+                },
+                error: function (response) {
+                    alert(response["responseJSON"]["error"]);
+                }
+            })
+        })
+    });
+    </script>
+
 <h4 class="title">Project name: {{ project.projectName }}</h4>
 
 <h6>Product owner: {{project.product_owner}}</h6>
 <h6>Scrum Master: {{project.scrum_master}}</h6><br>
-
-<form id="new-project-form" method="post" action="" class="col-4">
-{% csrf_token %}
-
-<h5 >Story list:</h5>
-
-    {% if velocityExceeded %}
-	    </br>
-	    <p class="text-danger">
-	        Sprint velocity exceded!
-	    </p>
-    {% endif %}
-
-{% for story in stories %}
-
-<div class="card story_cards">
-    <div class="card-header">{{story.name}}</div>
-    <div class="card-body">
-        <div>Description:
-        {{story.description}}</div>
-        <div>Priority:
-        {{story.priority}}</div>
-        <div>Business value:
-        {{story.businessValue}}</div>
-
-
-        {% if story.sprint == None and isScrumMaster %}
-        <div class="mb-3">
-            <div>
-                <label class="form-label" for="time_cost">Estimated time:</label>
-                <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+        <form id="new-project-form" method="post" action="" >
+            {% csrf_token %}
+            
+            <h5 >Story list</h5>
+            
+                {% if velocityExceeded %}
+                    </br>
+                    <p class="text-danger">
+                        Sprint velocity exceded!
+                    </p>
+                {% endif %}
+            
+            {% for story in stories %}
+            
+            <div class="card story_cards" style="max-width: 24rem;">
+                <div class="card-header">{{story.name}}</div>
+                <div class="card-body">
+                    <div>Description:
+                    {{story.description}}</div>
+                    <div>Priority:
+                    {{story.priority}}</div>
+                    <div>Business value:
+                    {{story.businessValue}}</div>
+            
+            
+                    {% if story.sprint == None and isScrumMaster %}
+                    <div class="mb-3">
+                        <div>
+                            <label class="form-label" for="time_cost">Estimated time:</label>
+                            <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
+                        </div>
+                    </div>
+                    {% else %}
+                    Time cost: {{ story.timeCost }} h
+                    {% endif %}
+            
+            
+            
+                    <div>Time spent:
+                    {{story.timeSpent}} h</div>
+                    <div>Comment:
+                    {{story.comment}}</div>
+                    <div>Development status:
+                    {{story.developmentStatus}}</div>
+            
+                    {% if story.sprint == None and story.timeCost != None and story.developmentStatus != 'accepted' and notProductOwner%}
+            
+            
+                        <div class="mb-3">
+                            <label for="sprint_{{ story.id }}">Add to current sprint (Velocity:{{ sprints.expectedSpeed }}; Still available: {{ velocityLeft }})</label><br>
+                            <input class="mt-1" type="checkbox" name="sprint_{{ story.id }}" value="{{ sprints.id }}" style="width:30px; height:30px;">
+                        </div>
+            
+                    {% else %}
+            
+                        <div>Sprint:
+                        {{story.sprint.start}} - {{story.sprint.end}}</div>
+            
+                    {% endif %}
+            
+                    <a href="story?id={{ story.id }}" style="color:#4F8EC3">Tasks</a>
+                </div>
+                
+                
+                
             </div>
+            
+            
+            {% endfor %}
+            
+                <input type="submit" value="Confirm changes" class="btn btn-primary " />
+            
+            </form>
         </div>
-        {% else %}
-        Time cost: {{ story.timeCost }} h
-        {% endif %}
-
-
-
-        <div>Time spent:
-        {{story.timeSpent}} h</div>
-        <div>Comment:
-        {{story.comment}}</div>
-        <div>Development status:
-        {{story.developmentStatus}}</div>
-
-        {% if story.sprint == None and story.timeCost != None and story.developmentStatus != 'accepted' and notProductOwner%}
-
-
-            <div class="mb-3">
-                <label for="sprint_{{ story.id }}">Add to current sprint (Velocity:{{ sprints.expectedSpeed }}; Still available: {{ velocityLeft }})</label><br>
-                <input class="mt-1" type="checkbox" name="sprint_{{ story.id }}" value="{{ sprints.id }}" style="width:30px; height:30px;">
+        <div  class="col-6">
+            
+            <h5 >Project wall</h5>
+            <div id="post_cards">
+                {% for post in posts %}
+                    <div class="card story_cards" >
+                        <div class="card-header">{{post.user.username}}
+                            <p class="card-text topnav-right">{{post.time_posted}}</p>
+                        </div>
+                        <div class="card-body text-dark">
+                        <p class="card-text">{{post.description}}</p>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+            <div class="story_cards sticky">
+                <form id="new-post-form"  >
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <select hidden class="form-control" name="project" required>
+                            <option hidden value="{{ project.id }}">{{ project.id }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="description"></label>
+                        <textarea class="form-control" rows="5" type="text" name="description" required></textarea>
+                    </div>
+                    <div class="mb-3"></div>
+                    <input id="add-post-btn" type="submit" value="Add post" 
+                                    class="btn btn-primary pull-right" name="{{ project.id }}"/>
+                    {% if success == True %}
+                    </br>
+                    <p class="text-success">
+                        Task added succesfuly!
+                    </p>
+                    {% endif %}
 
-        {% else %}
+                </form>
+            </div>
+            
+            <!--<button id="new-post" class="btn btn-primary" type="button" name="{{project.id}}">Add post</button>-->
+           <!-- <a id="new-post" class="btn btn-primary" href="story?id={{ story.id }}">Add post</a>-->
 
-            <div>Sprint:
-            {{story.sprint.start}} - {{story.sprint.end}}</div>
 
-        {% endif %}
-
-        <a href="story?id={{ story.id }}" style="color:#4F8EC3">Tasks</a>
+        </div>
+        
     </div>
-    
-    
-    
 </div>
 
-
-{% endfor %}
-
-    <input type="submit" value="Confirm changes" class="btn btn-primary pull-right float_button" />
-
-</form>
 {% endblock %}

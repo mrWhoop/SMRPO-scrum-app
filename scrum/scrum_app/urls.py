@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^my_tasks/$', views.my_tasks, name='my_tasks'),
     url(r'^ajax/task/timeupdate/$', views.new_task_form, name='task_time_update'),
     url(r'^ajax/task/asignupdate/$', views.update_task_asign, name='task_asign_update'),
+    url(r'^project/new_post/$', views.new_post_form, name='new_post_form'),
 ]

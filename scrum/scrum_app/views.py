@@ -1,5 +1,6 @@
 import datetime, pytz
 
+
 from django.db.models.functions import Lower
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -8,9 +9,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.contrib.auth.forms import  AuthenticationForm
 from django.contrib.auth import get_user_model
-from .models import Sprint, Story, Project, DevTeamMember, Task, LastLogin
+from .models import Sprint, Story, Project, DevTeamMember, Task, LastLogin, Post
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.urls import reverse_lazy
+from django.http import JsonResponse
+from django.core import serializers
+
+
 
 import sys
 
@@ -45,6 +51,10 @@ def project(request):
         project_id = request.GET.get('id')
 
         project = Project.objects.get(id=project_id)
+
+        posts = project.getPosts().order_by('-time_posted')
+
+    
 
         notProductOwner = True
         isScrumMaster = project.scrum_master_id == request.user.id
@@ -92,7 +102,7 @@ def project(request):
                     StoryObject.sprint_id = value
                     StoryObject.save()
 
-        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster})
+        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts})
     else:
         return HttpResponseRedirect('/login')
 
@@ -401,6 +411,21 @@ def update_task_asign(request):
     return HttpResponse(task_id)
 
 
+
+
+def new_post_form(request):
+    utc = pytz.UTC
+    if request.user.is_authenticated:
+        user = get_user_model().objects.get(id=request.user.id)
+        if request.is_ajax and request.method == 'POST':
+            description = request.POST['description']
+            project_id = request.POST['project']
+            project = Project.objects.get(id=project_id)
+            time_posted = utc.localize(datetime.datetime.now())
+            post = Post(project=project,user=user,time_posted=time_posted,description=description)
+            post.save()
+            return JsonResponse({"username":user.username,"time_posted":time_posted,"description":description}, status=200, safe=False)
+        return JsonResponse({"error": ""}, status=400)
 
 
 

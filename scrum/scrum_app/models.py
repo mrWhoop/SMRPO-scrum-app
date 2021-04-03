@@ -23,6 +23,11 @@ class Project(models.Model):
     def getDevTeamMembers(self):
         return DevTeamMember.objects.filter(projectId_id=self)
 
+    def getPosts(self):
+        return Post.objects.filter(project_id=self).order_by('-time_posted')
+
+    
+    
     stories = property(getStories)
 
 # dev team member without any special role
@@ -92,3 +97,12 @@ class Task(models.Model):
 
     # accepted, rejected, pending, free
     userConfirmed = models.TextField()
+
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    description = models.TextField()
+
+    time_posted = models.DateTimeField()
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
