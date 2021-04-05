@@ -43,6 +43,23 @@
 	margin-top: 30px;
 	text-decoration: none;
 }
+.cog {
+	color: black;
+	margin-left: 65px;
+	position: absolute;
+}
+
+.top{
+	bottom: 0;
+}
+
+.cog:hover{
+	cursor: pointer;
+}
+
+.logout-button{
+	max-width: 80%;
+}
 
 .topnav h1 {
 	float: left;

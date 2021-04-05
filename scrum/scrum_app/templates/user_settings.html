@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h4 class="title">Change user</h4>
+<form id="user-settings" method="post" 
+action="{% url 'user_settings' %}" class="col-4">
+    {% csrf_token %}
+	<div class="mb-3">
+		<label class="form-label" for="username">Username:</label>
+		<input class="form-control" type="text" name="username" value="{{username}}" >
+        {% if username_exists == True %}
+            <p class="text-danger">
+                Username already in use!
+            </p>
+        {% endif %}
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="first_name">First name:</label>
+		<input class="form-control" name="first_name" value="{{first_name}}"></input>
+	</div>
+	<div class="mb-3">
+        <label class="form-label" for="last_name">Last name:</label>
+		<input class="form-control" name="last_name" value="{{last_name}}"></input>
+	</div>
+	<div class="mb-3">
+        <label class="form-label" for="email">Email:</label>
+		<input class="form-control" name="email" value="{{email}}"></input>
+        {% if email_exists == True %}
+            <p class="text-danger">
+                Email already in use!
+            </p>
+        {% endif %}
+	</div>
+    <div class="mb-3">
+        <a href="/change_password/" style="color:#4F8EC3">Change password</a>
+    </div>
+    
+    <input type="submit" value="Confirm changes" 
+                       class="btn btn-primary " />
+    {% if success == True %}
+    </br>
+    <p class="text-success">
+        Success!
+    </p>
+    {% endif %}
+
+</form>
+
+{% endblock %}

@@ -2,7 +2,7 @@ import datetime, pytz
 
 
 from django.db.models.functions import Lower
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
@@ -15,6 +15,9 @@ from django.db.models import Q
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.core import serializers
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 
@@ -428,12 +431,59 @@ def new_post_form(request):
         return JsonResponse({"error": ""}, status=400)
 
 
+def user_settings(request):
+    if request.user.is_authenticated:
+        user = get_user_model().objects.get(id=request.user.id) 
+        success = False
+        username_exists = False
+        email_exists = False
+        if request.method == "POST":
+            username = request.POST['username']
+            firstname = request.POST['first_name']
+            lastname = request.POST['last_name']
+            email = request.POST['email']
+            if user.username != username and User.objects.filter(username=username):
+                username_exists = True
+                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "username_exists":username_exists})
+            elif user.email != email and User.objects.filter(email=email):
+                email_exists = True
+                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "email_exists":email_exists})
+            else:
+                user.username = username
+                user.first_name = firstname
+                user.last_name = lastname
+                user.email = email
+                user.save()
+                success = True
+                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "success":success})
+        else:
+            username = user.username
+            firstname = user.first_name
+            lastname = user.last_name
+            email = user.email
+            return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email})
+    else:
+       return HttpResponseRedirect('/login') 
 
 
 
 
-
-
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            success = True
+            return render(request, 'change_password.html', {'form':form, 'success':success})
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {
+        'form': form
+    })
 
 
 

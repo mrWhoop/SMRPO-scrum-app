@@ -23,4 +23,6 @@ urlpatterns = [
     url(r'^ajax/task/timeupdate/$', views.new_task_form, name='task_time_update'),
     url(r'^ajax/task/asignupdate/$', views.update_task_asign, name='task_asign_update'),
     url(r'^project/new_post/$', views.new_post_form, name='new_post_form'),
+    url(r'^user_settings/$', views.user_settings, name='user_settings'),
+    url(r'^change_password/$', views.change_password, name='change_password'),
 ]
