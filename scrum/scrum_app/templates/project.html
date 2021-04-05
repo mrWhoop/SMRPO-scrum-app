@@ -14,7 +14,6 @@
                 data: serializedData,
                 success: function (response){
                     $("#new-post-form").trigger('reset');
-                    console.log(response);
                    $("#post_cards").prepend(
                         `<div class="card story_cards" >
                             <div class="card-header">${response.username}
@@ -25,14 +24,30 @@
                             </div>
                         </div>
                         `
-                    )
+                    );
+                    
                 },
                 error: function (response) {
                     alert(response["responseJSON"]["error"]);
                 }
             })
-        })
+        });
+
+        $(".posts").slice(0, 3).show();
+        $("#loadMore").on('click', function (e) {
+            e.preventDefault();
+            $(".posts:hidden").slice(0, 3).slideDown();
+            if ($(".posts:hidden").length == 0) {
+                $("#load").fadeOut('slow');
+            }
+            $('html,body').animate({
+                scrollTop: $(this).offset().top
+            }, 1500);
+        });
+
     });
+
+    
     </script>
 
 <h4 class="title">Project name: {{ project.projectName }}</h4>
@@ -121,7 +136,7 @@
             <h5 >Project wall</h5>
             <div id="post_cards">
                 {% for post in posts %}
-                    <div class="card story_cards" >
+                    <div class="card story_cards posts" >
                         <div class="card-header">{{post.user.username}}
                             <p class="card-text topnav-right">{{post.time_posted}}</p>
                         </div>
@@ -131,8 +146,9 @@
                     </div>
                 {% endfor %}
             </div>
-            <div class="story_cards sticky">
-                <form id="new-post-form"  >
+            <a id="loadMore" class="btn btn-primary" href="#">Load more</a>
+            <div class="story_cards">
+                <form id="new-post-form" >
                     {% csrf_token %}
                     <div class="mb-3">
                         <select hidden class="form-control" name="project" required>
@@ -141,7 +157,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="description"></label>
-                        <textarea class="form-control" rows="5" type="text" name="description" required></textarea>
+                        <textarea class="form-control" rows="4" type="text" name="description" required></textarea>
                     </div>
                     <div class="mb-3"></div>
                     <input id="add-post-btn" type="submit" value="Add post" 
@@ -155,11 +171,6 @@
 
                 </form>
             </div>
-            
-            <!--<button id="new-post" class="btn btn-primary" type="button" name="{{project.id}}">Add post</button>-->
-           <!-- <a id="new-post" class="btn btn-primary" href="story?id={{ story.id }}">Add post</a>-->
-
-
         </div>
         
     </div>

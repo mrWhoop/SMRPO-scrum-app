@@ -49,9 +49,9 @@ def project(request):
     if request.user.is_authenticated:
 
         project_id = request.GET.get('id')
-
+        print(project_id)
         project = Project.objects.get(id=project_id)
-
+        
         posts = project.getPosts().order_by('-time_posted')
 
     

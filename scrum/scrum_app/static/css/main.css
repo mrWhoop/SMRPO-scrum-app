@@ -78,8 +78,20 @@
 	margin-bottom: 20px;
 }
 
-.sticky{
-	position: -webkit-sticky;
-  position: sticky;
-  top: 0;
+
+
+
+#loadMore {
+ 
+    transition: all 600ms ease-in-out;
+    -webkit-transition: all 600ms ease-in-out;
+    -moz-transition: all 600ms ease-in-out;
+    -o-transition: all 600ms ease-in-out;
 }
+
+
+.posts{
+	display:none  ;
+}
+
+
