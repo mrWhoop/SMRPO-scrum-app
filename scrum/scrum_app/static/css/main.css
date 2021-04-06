@@ -111,4 +111,7 @@
 	display:none  ;
 }
 
+.select:hover{
+	cursor: pointer;
+}
 

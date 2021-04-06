@@ -135,7 +135,8 @@ def new_story_form(request):
 
     if request.user.is_authenticated:
         user = user = get_user_model().objects.get(id=request.user.id)
-        projects = Project.objects.filter(product_owner=user)
+        #projects = Project.objects.filter(product_owner=user)
+        projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
         # sprints = Sprint.objects.all()
         success = False
         name_exists = False
@@ -428,7 +429,7 @@ def new_post_form(request):
             post = Post(project=project,user=user,time_posted=time_posted,description=description)
             post.save()
             return JsonResponse({"username":user.username,"time_posted":time_posted,"description":description}, status=200, safe=False)
-        return JsonResponse({"error": ""}, status=400)
+        return JsonResponse({"errorMsg": ""}, status=400)
 
 
 def user_settings(request):
@@ -463,27 +464,47 @@ def user_settings(request):
             email = user.email
             return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email})
     else:
-       return HttpResponseRedirect('/login') 
+       return HttpResponseRedirect('/login/') 
 
 
 
 
 def change_password(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
-            success = True
-            return render(request, 'change_password.html', {'form':form, 'success':success})
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = PasswordChangeForm(request.user, request.POST)
+            if form.is_valid():
+                user = form.save()
+                update_session_auth_hash(request, user)  # Important!
+                messages.success(request, 'Your password was successfully updated!')
+                success = True
+                return render(request, 'change_password.html', {'form':form, 'success':success})
+            else:
+                messages.error(request, 'Please correct the error below.')
         else:
-            messages.error(request, 'Please correct the error below.')
+            form = PasswordChangeForm(request.user)
+        return render(request, 'change_password.html', {
+            'form': form
+        })
     else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {
-        'form': form
-    })
+        return HttpResponseRedirect('/login/') 
 
 
-
+def delete_task(request, story_id, task_id):
+    if request.user.is_authenticated:
+        story = Story.objects.get(id=story_id)
+        project = story.project
+        dev_team_members = project.getDevTeamMembers()
+        scrum_master = project.scrum_master
+        task = Task.objects.get(id=task_id)
+        if (request.user in dev_team_members or request.user == scrum_master) and task.userConfirmed != 'accepted':
+            task.delete()
+            return JsonResponse({"text":"text"}, status=200, safe=False)
+        else:
+            if(request.user not in dev_team_members and request.user != scrum_master):
+                return JsonResponse({"errorMsg": "User is not dev member or scrum master"}, status=400)
+            else:
+                return JsonResponse({"errorMsg": "Task is already accepted"}, status=400)
+        return 
+    else:
+      return HttpResponseRedirect('/login/')   

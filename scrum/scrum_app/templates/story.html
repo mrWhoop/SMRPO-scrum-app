@@ -78,6 +78,29 @@ var sw = {
   }
 };
 window.addEventListener("load", sw.init);
+
+$(document).ready(function() {
+  $(".fa-trash-alt").click(function(){
+    console.log(this.id)
+    var id = this.id
+    $.ajax({
+      type: 'DELETE',
+      url: `/project/story/{{story.id}}/delete/${id}`,
+      dataType: 'json',
+      beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+      },
+      success: function(response){
+        $(`#${id}`).remove()
+      },
+      error: function(response){
+        console.log(response)
+        alert(response["errorMsg"])
+      }
+    })
+  })
+
+})
 </script>
 {% endblock %}
 
@@ -104,17 +127,22 @@ window.addEventListener("load", sw.init);
       <th scope="col" class="col-2">Time spent (h)</th>
       <th scope="col" class="col-2">Assigned to</th>
       <th scope="col" class="col-2">Confirmation status</th>
+      <th scope="col" class="col-2"></th>
     </tr>
   </thead>
   <tbody>
     {% for task in tasks %}
     <tr class="d-flex">
       <th scope="row">{{ forloop.counter }}</th>
-      <td class="col-12">{{task.description}}</td>
+      <td class="col-12 select">{{task.description}}</td>
       <td class="col-2">{{task.timeCost}}</td>
       <td class="col-2">{{task.time_spent}}</td>
       <td class="col-2">{{task.assignedUser}}</td>
       <td class="col-2">{{task.userConfirmed}}</td>
+      <td class="col-2">
+        <!--<a href="/project/story/delete_task" id="delete_task">-->
+          <i class="fas fa-trash-alt cog select" id="{{task.id}}"></i></td>
+        <!--</a>-->
     </tr>
     {% endfor %}
   </tbody>

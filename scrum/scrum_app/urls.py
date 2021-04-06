@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^project/new_post/$', views.new_post_form, name='new_post_form'),
     url(r'^user_settings/$', views.user_settings, name='user_settings'),
     url(r'^change_password/$', views.change_password, name='change_password'),
+    url(r'^project/story/(?P<story_id>.*)/delete/(?P<task_id>.*)$', views.delete_task, name='delete_task'),
 ]
