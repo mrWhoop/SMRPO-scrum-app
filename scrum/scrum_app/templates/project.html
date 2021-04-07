@@ -28,7 +28,7 @@
                     
                 },
                 error: function (response) {
-                    alert(response.errorMsg);
+                    alertify.alert(response["responseJSON"]["errorMsg"]);
                 }
             })
         });

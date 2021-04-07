@@ -79,9 +79,10 @@ var sw = {
 };
 window.addEventListener("load", sw.init);
 
+
+
 $(document).ready(function() {
   $(".fa-trash-alt").click(function(){
-    console.log(this.id)
     var id = this.id
     $.ajax({
       type: 'DELETE',
@@ -91,21 +92,25 @@ $(document).ready(function() {
                     xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
       },
       success: function(response){
-        $(`#${id}`).remove()
+        $(`#row_${id}`).remove()
       },
       error: function(response){
-        console.log(response)
-        alert(response["errorMsg"])
+        alertify.alert(response["responseJSON"]["errorMsg"])
       }
     })
-  })
+  });
+  $(".col-12.select").click(function(){
+    var id = this.id
+    console.log(id)
+    $(this).modalForm({formURL: `/project/story/update/${id}/`});
+  });
 
 })
 </script>
 {% endblock %}
 
 <h4 class="title">Story name: {{ story.name }}</h4>
-<form id="new-story-form" method="post" action="" class="col-4">
+<div  class="col-4">
 {% csrf_token %}
 {% if sprint_active == True and user_is_product_owner == False %}
     <a href="new_task?story_id={{ story.id }}"  class="btn btn-primary ">Add task</a>
@@ -127,27 +132,41 @@ $(document).ready(function() {
       <th scope="col" class="col-2">Time spent (h)</th>
       <th scope="col" class="col-2">Assigned to</th>
       <th scope="col" class="col-2">Confirmation status</th>
+      {% if user_is_product_owner == False %}
       <th scope="col" class="col-2"></th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
     {% for task in tasks %}
-    <tr class="d-flex">
+    <tr class="d-flex" id="row_{{task.id}}">
       <th scope="row">{{ forloop.counter }}</th>
-      <td class="col-12 select">{{task.description}}</td>
+      {% if user_is_product_owner == False %}
+      <td class="col-12 select" id="{{task.pk}}">{{task.description}}</td>
+      {% else %}
+      <td class="col-12">{{task.description}}</td>
+      {% endif %}
       <td class="col-2">{{task.timeCost}}</td>
       <td class="col-2">{{task.time_spent}}</td>
       <td class="col-2">{{task.assignedUser}}</td>
       <td class="col-2">{{task.userConfirmed}}</td>
+      {% if user_is_product_owner == False %}
       <td class="col-2">
-        <!--<a href="/project/story/delete_task" id="delete_task">-->
-          <i class="fas fa-trash-alt cog select" id="{{task.id}}"></i></td>
-        <!--</a>-->
+        <!--<button  type="button" id="update-task" class="bs-modal btn btn-sm btn-primary" data-form-url="{% url 'update_task' task.pk %}"></button>
+        </button>-->
+          <i class="fas fa-trash-alt cog select" id="{{task.id}}"></i>
+      </td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content"></div>
+  </div>
+</div>
 
     <!--
     <div id="stopwatch" style="display: flex; flex-wrap: wrap; max-width: 160px; margin: 0 auto;">
@@ -163,5 +182,5 @@ $(document).ready(function() {
 
     
 
-</form>
+  </div>
 {% endblock %}

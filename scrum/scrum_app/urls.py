@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^user_settings/$', views.user_settings, name='user_settings'),
     url(r'^change_password/$', views.change_password, name='change_password'),
     url(r'^project/story/(?P<story_id>.*)/delete/(?P<task_id>.*)$', views.delete_task, name='delete_task'),
+    url(r'^project/story/update/(?P<pk>\d+)/$', views.TaskUpdateView.as_view(), name='update_task'),
 ]

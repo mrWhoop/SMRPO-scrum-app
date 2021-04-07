@@ -18,6 +18,8 @@ from django.core import serializers
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from bootstrap_modal_forms.generic import BSModalUpdateView
+from .forms import TaskModelForm
 
 
 
@@ -507,4 +509,19 @@ def delete_task(request, story_id, task_id):
                 return JsonResponse({"errorMsg": "Task is already accepted"}, status=400)
         return 
     else:
-      return HttpResponseRedirect('/login/')   
+      return HttpResponseRedirect('/login/')  
+
+class TaskUpdateView(BSModalUpdateView):
+    model = Task
+    template_name = 'update_task.html'
+    form_class = TaskModelForm
+    success_message = 'Success: Task was updated.'
+    success_url = reverse_lazy('index')
+
+    """def post(self,request, pk):
+        form = TaskModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"text":"text"}, status=200, safe=False)
+        else:
+            pass"""
