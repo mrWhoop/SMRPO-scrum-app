@@ -1,35 +1,48 @@
 {% load widget_tweaks %}
 
-<form method="post" action="">
-    {% csrf_token %}
-  
-    <div class="modal-header">
-      <h3 class="modal-title">Edit task</h3>
 
-    </div>
-  
-    <div class="modal-body">
-      <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
-        {% for error in form.non_field_errors %}
-          {{ error }}
-        {% endfor %}
+<form id="update-task" method="post" action="">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h3 class="modal-title">Update Book</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-  
-      {% for field in form %}
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {% render_field field class="form-control" placeholder=field.label %}
-          <div class="{% if field.errors %} invalid{% endif %}">
-            {% for error in field.errors %}
-              <p class="help-block">{{ error }}</p>
-            {% endfor %}
-          </div>
+      <div class="modal-body">
+        <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
         </div>
-      {% endfor %}
-    </div>
-  
-    <div class="modal-footer">
-      <button type="submit" class="btn btn-primary">Update</button>
-    </div>
-  
+            <div class="mb-3">
+                <label class="form-label" for="description">Description:</label>
+                <textarea class="form-control" rows="5" type="text" name="description" required>{{task.description}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="time_cost">Time cost (h):</label>
+                <input value="{{task.timeCost}}" placeholder="00.00" class="form-control" maxlength="5" pattern="\d{1,5}\.\d{1,2}" type="text" type="text" name="time_cost" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="assignedUser">Assign to:</label>
+                <select class="form-control" name="assignedUser">
+                    <option value="{{task.assignedUser}}" selected>{{task.assignedUser}}</option>
+                    {% if task.assignedUser != None %}
+                        <option value="None">None</option>
+                    {% endif %}
+                {% for user in users %}
+                    <option value="{{ user.userId }}">{{ user.userId }}</option>
+                {% endfor %}
+                </select>
+            </div>
+            {% if error == True %}
+            </br>
+            <p class="text-danger">
+                {{error_msg}}
+            </p>
+            {% endif %}
+      </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary pull-right" >Save changes</button>
+        </div>
   </form>

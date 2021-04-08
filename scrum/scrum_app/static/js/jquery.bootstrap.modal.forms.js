@@ -10,6 +10,8 @@ https://github.com/trco/django-bootstrap-modal-forms
     // Open modal & load the form at formURL to the modalContent element
     var modalForm = function (settings) {
         $(settings.modalID).find(settings.modalContent).load(settings.formURL, function () {
+            
+            console.log(settings)
             $(settings.modalID).modal("show");
             $(settings.modalForm).attr("action", settings.formURL);
             addEventHandlers(settings);
@@ -32,6 +34,7 @@ https://github.com/trco/django-bootstrap-modal-forms
 
     // Check if form.is_valid() & either show errors or submit it via callback
     var isFormValid = function (settings, callback) {
+        
         $.ajax({
             type: $(settings.modalForm).attr("method"),
             url: $(settings.modalForm).attr("action"),
@@ -62,14 +65,12 @@ https://github.com/trco/django-bootstrap-modal-forms
             $(settings.modalForm).submit();
         } else {          
             var asyncSettingsValid = validateAsyncSettings(settings.asyncSettings);
-            
             if (asyncSettingsValid) {                
                 var asyncSettings = settings.asyncSettings;
                 // Serialize form data
                 var formdata = new FormData($(settings.modalForm)[0]);
                 // Add asyncUpdate and check for it in save method of CreateUpdateAjaxMixin
-                formdata.append("asyncUpdate", "True");
-                
+                formdata.append("asyncUpdate", "True")
                 $.ajax({
                     type: $(settings.modalForm).attr("method"),
                     url: $(settings.modalForm).attr("action"),
@@ -82,7 +83,6 @@ https://github.com/trco/django-bootstrap-modal-forms
                             console.error("django-bootstrap-modal-forms: <body> element missing in your html.");
                         }
                         body.prepend(asyncSettings.successMessage);
-    
                         // Update page without refresh
                         $.ajax({
                             type: "GET",
@@ -90,6 +90,27 @@ https://github.com/trco/django-bootstrap-modal-forms
                             dataType: "json",
                             success: function (response) {
                                 // Update page
+                                console.log(response)
+                                $(asyncSettings.dataElementId).html(response[asyncSettings.dataKey]);
+    
+                                // Add modalForm to trigger element after async page update
+                                if (asyncSettings.addModalFormFunction) {
+                                    asyncSettings.addModalFormFunction();
+                                }
+    
+                                if (asyncSettings.closeOnSubmit) {
+                                    $(settings.modalID).modal("hide");
+                                } else {
+                                    // Reload form
+                                    $(settings.modalID).find(settings.modalContent).load(settings.formURL, function () {
+                                        $(settings.modalForm).attr("action", settings.formURL);
+                                        addEventHandlers(settings);
+                                    });
+                                }
+                            },
+                            error: function (response) {
+                                // Update page
+                                console.log(response)
                                 $(asyncSettings.dataElementId).html(response[asyncSettings.dataKey]);
     
                                 // Add modalForm to trigger element after async page update

@@ -7,4 +7,4 @@ class TaskModelForm(BSModalModelForm):
     
     class Meta:
         model = Task
-        fields = [ 'timeCost', 'description', 'assignedUser', 'userConfirmed']
+        fields = ['timeCost' , 'description', 'assignedUser']

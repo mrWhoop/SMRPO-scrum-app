@@ -99,13 +99,33 @@ $(document).ready(function() {
       }
     })
   });
-  $(".col-12.select").click(function(){
-    var id = this.id
-    console.log(id)
-    $(this).modalForm({formURL: `/project/story/update/${id}/`});
-  });
 
-})
+  
+
+  function updateTaskModalForm(){
+    $(".fa-edit").each(function(){
+      var taskStoryId = this.id.split("_")
+      var taskId = taskStoryId[0]
+      var storyId = taskStoryId[1]
+      $(this).modalForm({
+        formURL: `/project/story/update_task/${taskId}/`,
+        /*asyncUpdate: true,
+        asyncSettings:{
+          closeOnSubmit:true,
+          successMessage: [],
+          dataUrl: `/project/story/?id=${storyId}`,
+          dataElementId: "#tasks-table",
+          dataKey: "context",
+          addModalFormFunction: updateTaskModalForm
+        }*/
+      });
+    });
+  }
+  updateTaskModalForm()
+  
+ 
+
+});
 </script>
 {% endblock %}
 
@@ -123,7 +143,7 @@ $(document).ready(function() {
 <h5 >Tasks list:</h5>
 
 
-<table class="table table-hover">
+<table id="tasks-table" class="table">
   <thead>
     <tr class="d-flex">
       <th scope="col">#</th>
@@ -134,6 +154,7 @@ $(document).ready(function() {
       <th scope="col" class="col-2">Confirmation status</th>
       {% if user_is_product_owner == False %}
       <th scope="col" class="col-2"></th>
+      <th scope="col" class="col-1"></th>
       {% endif %}
     </tr>
   </thead>
@@ -151,11 +172,12 @@ $(document).ready(function() {
       <td class="col-2">{{task.assignedUser}}</td>
       <td class="col-2">{{task.userConfirmed}}</td>
       {% if user_is_product_owner == False %}
-      <td class="col-2">
-        <!--<button  type="button" id="update-task" class="bs-modal btn btn-sm btn-primary" data-form-url="{% url 'update_task' task.pk %}"></button>
-        </button>-->
+      <td class="col-1">
           <i class="fas fa-trash-alt cog select" id="{{task.id}}"></i>
       </td>
+      <td class="col-2">
+          <i class="fas fa-edit cog" id="{{task.id}}_{{story.id}}"></i>
+    </td>
       {% endif %}
     </tr>
     {% endfor %}
@@ -167,6 +189,8 @@ $(document).ready(function() {
     <div class="modal-content"></div>
   </div>
 </div>
+
+
 
     <!--
     <div id="stopwatch" style="display: flex; flex-wrap: wrap; max-width: 160px; margin: 0 auto;">

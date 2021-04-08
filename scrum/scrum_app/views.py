@@ -1,6 +1,6 @@
 import datetime, pytz
 
-
+import json
 from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -20,6 +20,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from bootstrap_modal_forms.generic import BSModalUpdateView
 from .forms import TaskModelForm
+from django.template.loader import render_to_string
 
 
 
@@ -128,7 +129,7 @@ def story(request):
         product_owner = project.product_owner
         if request.user == product_owner:
             user_is_product_owner = True
-
+        
         return render(request,'story.html', context={'story':story,'tasks':tasks, 'sprint_active':sprint_active,'user_is_product_owner':user_is_product_owner})
     else:
         return HttpResponseRedirect('/login')
@@ -507,9 +508,41 @@ def delete_task(request, story_id, task_id):
                 return JsonResponse({"errorMsg": "User is not dev member or scrum master"}, status=400)
             else:
                 return JsonResponse({"errorMsg": "Task is already accepted"}, status=400)
-        return 
+        
     else:
       return HttpResponseRedirect('/login/')  
+
+
+def update_task(request,id):
+    if request.user.is_authenticated:
+        task = Task.objects.get(id=id)
+        story = task.story
+        project = story.project
+        dev_team_members = project.getDevTeamMembers()
+        scrum_master = project.scrum_master
+        if request.is_ajax and request.method == 'POST':
+            if (request.user in dev_team_members or request.user == scrum_master) and task.userConfirmed != 'accepted':
+                new_description = request.POST["description"]
+                new_timeCost = request.POST["time_cost"]
+                new_assignedUser = request.POST["assignedUser"]
+                task.description = new_description
+                task.time_cost = new_timeCost
+                if new_assignedUser != 'None':
+                    task.assignedUser = User.objects.get(username=new_assignedUser)
+                task.save()
+                return HttpResponseRedirect('/project/story/?id='+str(story.id))
+            else:
+                if(request.user not in dev_team_members and request.user != scrum_master):
+                    return HttpResponse({"error": True, "error_msg":"User is not dev member or scrum master",'task':task,'users':dev_team_members})
+                    #return render(request, "update_task.html", context={"error": True, "error_msg":"User is not dev member or scrum master",'task':task,'users':dev_team_members})
+                else:
+                    return HttpResponse({"error": True, "error_msg":"User is not dev member or scrum master",'task':task,'users':dev_team_members})
+                   # return render(request, "update_task.html", context={"error": True, "error_msg":"Task is already accepted",'task':task,'users':dev_team_members})
+        
+        else:
+            return render(request, "update_task.html",context={'task':task,'users':dev_team_members})
+    else:
+        return HttpResponseRedirect('/login/')
 
 class TaskUpdateView(BSModalUpdateView):
     model = Task
@@ -518,10 +551,36 @@ class TaskUpdateView(BSModalUpdateView):
     success_message = 'Success: Task was updated.'
     success_url = reverse_lazy('index')
 
-    """def post(self,request, pk):
-        form = TaskModelForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({"text":"text"}, status=200, safe=False)
+    def post(self,request, pk):
+        if request.user.is_authenticated:
+            task = Task.objects.get(pk=pk)
+            story = task.story
+            project = story.project
+            dev_team_members = project.getDevTeamMembers()
+            scrum_master = project.scrum_master
+            if (request.user in dev_team_members or request.user == scrum_master) and task.userConfirmed != 'accepted':
+                new_description = request.POST["description"]
+                new_timeCost = request.POST["time_cost"]
+                new_assignedUser = request.POST["assignedUser"]
+                task.description = new_description
+                task.time_cost = new_timeCost
+                if new_assignedUser != 'None':
+                    task.assignedUser = User.objects.get(username=new_assignedUser)
+                task.save()
+                return HttpResponseRedirect('/project/story/?id='+str(story.id))
+            else:
+                HttpResponse("<div class='.invalid'></div>")
         else:
-            pass"""
+            return HttpResponseRedirect('/login/')
+
+    def get(self,request,pk):
+        if request.user.is_authenticated:
+            task = Task.objects.get(pk=pk)
+            story = task.story
+            project = story.project
+            dev_team_members = project.getDevTeamMembers()
+            scrum_master = project.scrum_master
+            return render(request, "update_task.html",context={'task':task,'users':dev_team_members})
+        else:
+            return HttpResponseRedirect('/login/')
+
