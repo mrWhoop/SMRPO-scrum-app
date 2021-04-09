@@ -566,6 +566,10 @@ class TaskUpdateView(BSModalUpdateView):
                 task.time_cost = new_timeCost
                 if new_assignedUser != 'None':
                     task.assignedUser = User.objects.get(username=new_assignedUser)
+                    task.userConfirmed = 'pending'
+                else:
+                    task.assignedUser = None
+                    task.userConfirmed = 'free'
                 task.save()
                 return HttpResponseRedirect('/project/story/?id='+str(story.id))
             else:

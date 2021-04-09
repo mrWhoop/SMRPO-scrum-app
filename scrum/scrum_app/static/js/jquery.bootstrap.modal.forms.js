@@ -10,8 +10,6 @@ https://github.com/trco/django-bootstrap-modal-forms
     // Open modal & load the form at formURL to the modalContent element
     var modalForm = function (settings) {
         $(settings.modalID).find(settings.modalContent).load(settings.formURL, function () {
-            
-            console.log(settings)
             $(settings.modalID).modal("show");
             $(settings.modalForm).attr("action", settings.formURL);
             addEventHandlers(settings);
@@ -34,7 +32,6 @@ https://github.com/trco/django-bootstrap-modal-forms
 
     // Check if form.is_valid() & either show errors or submit it via callback
     var isFormValid = function (settings, callback) {
-        
         $.ajax({
             type: $(settings.modalForm).attr("method"),
             url: $(settings.modalForm).attr("action"),
@@ -109,24 +106,7 @@ https://github.com/trco/django-bootstrap-modal-forms
                                 }
                             },
                             error: function (response) {
-                                // Update page
                                 console.log(response)
-                                $(asyncSettings.dataElementId).html(response[asyncSettings.dataKey]);
-    
-                                // Add modalForm to trigger element after async page update
-                                if (asyncSettings.addModalFormFunction) {
-                                    asyncSettings.addModalFormFunction();
-                                }
-    
-                                if (asyncSettings.closeOnSubmit) {
-                                    $(settings.modalID).modal("hide");
-                                } else {
-                                    // Reload form
-                                    $(settings.modalID).find(settings.modalContent).load(settings.formURL, function () {
-                                        $(settings.modalForm).attr("action", settings.formURL);
-                                        addEventHandlers(settings);
-                                    });
-                                }
                             }
                         });
                     }
