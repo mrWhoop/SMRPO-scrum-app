@@ -96,6 +96,11 @@ class Task(models.Model):
     # accepted, rejected, pending, free
     userConfirmed = models.TextField()
 
+    def getTimeSpent(self):
+        return TimeSpent.objects.filter(task_id=self)
+
+    timeSpent = property(getTimeSpent)
+
 class TimeSpent(models.Model):
 
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
