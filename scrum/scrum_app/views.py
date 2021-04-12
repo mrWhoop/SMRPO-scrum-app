@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.contrib.auth.forms import  AuthenticationForm
 from django.contrib.auth import get_user_model
-from .models import Sprint, Story, Project, DevTeamMember, Task, LastLogin, Post
+from .models import Sprint, Story, Project, DevTeamMember, Task, LastLogin, Post, TimeSpent
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.urls import reverse_lazy
@@ -587,4 +587,77 @@ class TaskUpdateView(BSModalUpdateView):
             return render(request, "update_task.html",context={'task':task,'users':dev_team_members})
         else:
             return HttpResponseRedirect('/login/')
+
+def logTime(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            # updating time done on task from stopwatch
+            # to be changes on form submision
+
+            today = datetime.date.today()
+
+            taskId = request.POST['id']
+            time = request.POST['time']
+
+            task = Task.objects.get(pk=taskId)
+            timeSpent = TimeSpent.objects.filter(task=task, date=today)
+
+            if len(timeSpent) == 0:
+                timeSpent = TimeSpent(task=task, date=today, time_spent=time)
+                timeSpent.save()
+            else:
+                timeSpent = timeSpent[0]
+                timeSpent.time_spent = timeSpent.time_spent + int(time)
+                timeSpent.save()
+
+            times = TimeSpent.objects.filter(task=task)
+
+            for time in times:
+                remain = int(time.time_spent)
+                hours = int(remain / 3600)
+                remain -= hours * 3600
+                mins = int(remain / 60)
+                remain -= mins * 60
+                secs = remain
+
+                hours = str(hours)
+                if len(hours) < 2:
+                    hours = '0' + hours
+                mins = str(mins)
+                if len(mins) < 2:
+                    mins = '0' + mins
+                secs = str(secs)
+                if len(secs) < 2:
+                    secs = '0' + secs
+
+                time.time_spent = hours + ':' + mins + ':' + secs
+
+            return render(request, "log_time.html", context={'task': task, 'times': times})
+        else:
+            task = Task.objects.get(pk=request.GET.get('id'))
+            times = TimeSpent.objects.filter(task=task)
+
+            for time in times:
+                remain = int(time.time_spent)
+                hours = int(remain / 3600)
+                remain -= hours * 3600
+                mins = int(remain / 60)
+                remain -= mins * 60
+                secs = remain
+
+                hours = str(hours)
+                if len(hours) < 2:
+                    hours = '0' + hours
+                mins = str(mins)
+                if len(mins) < 2:
+                    mins = '0' + mins
+                secs = str(secs)
+                if len(secs) < 2:
+                    secs = '0' + secs
+
+                time.time_spent = hours + ':' + mins + ':' + secs
+
+            return render(request, "log_time.html", context={'task': task, 'times': times})
+    else:
+        return HttpResponseRedirect('/login/')
 

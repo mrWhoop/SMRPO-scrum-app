@@ -100,7 +100,7 @@ class TimeSpent(models.Model):
 
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
-    time_spent = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    time_spent = models.IntegerField(null=True)
 
     date = models.DateField()
 
