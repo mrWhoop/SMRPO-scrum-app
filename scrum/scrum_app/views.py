@@ -552,8 +552,10 @@ class TaskUpdateView(BSModalUpdateView):
                 new_description = request.POST["description"]
                 new_timeCost = request.POST["time_cost"]
                 new_assignedUser = request.POST["assignedUser"]
+                done = request.POST.get('done', "false")
                 task.description = new_description
                 task.timeCost = new_timeCost
+                task.done = done == "on"
                 if new_assignedUser != 'None':
                     task.assignedUser = User.objects.get(username=new_assignedUser)
                     task.userConfirmed = 'pending'

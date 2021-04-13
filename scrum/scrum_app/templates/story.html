@@ -151,7 +151,8 @@ $(document).ready(function() {
       <th scope="col" class="col-2">Time cost (h)</th>
       <th scope="col" class="col-2">Time spent (h)</th>
       <th scope="col" class="col-2">Assigned to</th>
-      <th scope="col" class="col-2">Confirmation status</th>
+      <th scope="col" class="col-3">Confirmation status</th>
+      <th scope="col" class="col-2">Done</th>
       {% if user_is_product_owner == False %}
       <th scope="col" class="col-2"></th>
       <th scope="col" class="col-1"></th>
@@ -166,7 +167,8 @@ $(document).ready(function() {
           <td class="col-2">{{task.timeCost}}</td>
           <td class="col-2">{{time}}</td>
           <td class="col-2">{{task.assignedUser}}</td>
-          <td class="col-2">{{task.userConfirmed}}</td>
+          <td class="col-3">{{task.userConfirmed}}</td>
+          <td class="col-2">{{task.done}}</td>
           {% if user_is_product_owner == False and task.userConfirmed != 'accepted' and time == 0  %}
           <td class="col-1">
               <i class="fas fa-trash-alt cog select" id="{{task.id}}"></i>
