@@ -21,7 +21,7 @@
 		    			<div class="card-body">
 			    				{% for task in story.tasks %}
 
-			    				{% if user.id == task.assignedUser_id or task.userConfirmed == 'free' or task.userConfirmed == 'rejected' %}
+			    				{% if user.id == task.assignedUser_id or task.userConfirmed == 'free' or task.userConfirmed == 'rejected' or task.userConfirmed == 'pending' %}
 
 				    				<div class="card">
 						    			<div class="card-body">
@@ -38,7 +38,7 @@
 						    					</div>
 						    					<div class="col">
 													
-													<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if task.userConfirmed == 'free' or task.userConfirmed == 'rejected'  or task.userConfirmed == 'pending' %} d-none {% endif %}">Reject</div>
+													<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if task.userConfirmed == 'free' or task.userConfirmed == 'rejected'  or task.userConfirmed != 'accepted' %} d-none {% endif %}">Reject</div>
 						    					</div>
 						    				</div>
 						    			</div>

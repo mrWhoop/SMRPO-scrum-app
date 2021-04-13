@@ -74,6 +74,8 @@ def project(request):
 
         sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
 
+        ended_sprints = Sprint.objects.filter(project=project).filter(end__lte=today)
+
         velocityLeft = 0
         if len(sprints) < 1:
             sprints = None
@@ -104,11 +106,16 @@ def project(request):
                         return render(request, 'project.html',
                                       context={'project': project, 'stories': stories, 'sprints': sprints,
                                                'activate_home': 'active', 'velocityLeft': velocityLeft, 'velocityExceeded': True, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster})
-
                     StoryObject.sprint_id = value
                     StoryObject.save()
 
-        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts})
+                if field == 'status' and value != 'None':
+                    StoryObject = Story.objects.get(id=int(story_id))
+                    StoryObject.developmentStatus = value
+                    StoryObject.save()
+
+
+        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts, 'ended_sprints': ended_sprints})
     else:
         return HttpResponseRedirect('/login')
 

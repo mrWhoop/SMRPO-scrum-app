@@ -99,8 +99,28 @@
                     {{story.timeSpent}} h</div>
                     <div>Comment:
                     {{story.comment}}</div>
-                    <div>Development status:
-                    {{story.developmentStatus}}</div>
+                    <div>
+                        {% if not notProductOwner and story.sprint in ended_sprints %}
+
+                            <div class="mb-3">
+                                <label for="status_{{ story.id }}">Development status:</label>
+                                <select name="status_{{ story.id }}">
+                                    <option value="new">New</option>
+                                    <option value="in_progress">In progress</option>
+                                    <option value="incomplete">Incomplete</option>
+                                    <option value="accepted">Accepted</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+
+                        {% else %}
+                        
+                            Development status:
+                            {{story.developmentStatus}}
+
+                        {% endif %}
+
+                    </div>
             
                     {% if story.sprint == None and story.timeCost != None and story.developmentStatus != 'accepted' and notProductOwner%}
             
