@@ -8,14 +8,16 @@
             e.preventDefault()
 
             var serializedData = $(this).serialize();
+        
             $.ajax({
                 type: 'POST',
                 url: "{% url 'new_post_form'%}",
                 data: serializedData,
                 success: function (response){
                     $("#new-post-form").trigger('reset');
-                   $("#post_cards").prepend(
-                        `<div class="card story_cards" >
+                
+                    $("#post_cards").prepend(
+                        `<div class="card story_cards" style="visibilty:hidden;">
                             <div class="card-header">${response.username}
                                 <p class="card-text topnav-right">${response.time_posted}</p>
                             </div>
@@ -25,6 +27,7 @@
                         </div>
                         `
                     );
+                
                     
                 },
                 error: function (response) {
@@ -166,7 +169,7 @@
                     </div>
                 {% endfor %}
             </div>
-            <a id="loadMore" class="btn btn-primary" href="#">Load more</a>
+            <a id="loadMore" class="btn btn-primary {% if posts.count <= 3 %} d-none {% endif %}" href="#">Load more</a>
             <div class="story_cards">
                 <form id="new-post-form" >
                     {% csrf_token %}

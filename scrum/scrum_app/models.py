@@ -89,14 +89,25 @@ class Task(models.Model):
 
     timeCost = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
-    time_spent = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-
     description = models.TextField()
 
     assignedUser = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     # accepted, rejected, pending, free
     userConfirmed = models.TextField()
+
+    def getTimeSpent(self):
+        return TimeSpent.objects.filter(task_id=self)
+
+    timeSpent = property(getTimeSpent)
+
+class TimeSpent(models.Model):
+
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+
+    time_spent = models.IntegerField(null=True)
+
+    date = models.DateField()
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

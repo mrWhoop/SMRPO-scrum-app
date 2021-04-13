@@ -100,7 +100,7 @@ $(document).ready(function() {
     })
   });
 
-  
+
 
   function updateTaskModalForm(){
     $(".fa-edit").each(function(){
@@ -122,8 +122,8 @@ $(document).ready(function() {
     });
   }
   updateTaskModalForm()
-  
- 
+
+
 
 });
 </script>
@@ -159,26 +159,26 @@ $(document).ready(function() {
     </tr>
   </thead>
   <tbody>
-    {% for task in tasks %}
-    <tr class="d-flex" id="row_{{task.id}}">
-      <th scope="row">{{ forloop.counter }}</th>
-      <td class="col-12">{{task.description}}</td>
-      <td class="col-2">{{task.timeCost}}</td>
-      <td class="col-2">{{task.time_spent}}</td>
-      <td class="col-2">{{task.assignedUser}}</td>
-      <td class="col-2">{{task.userConfirmed}}</td>
-      {% if user_is_product_owner == False and task.userConfirmed != 'accepted' %}
-      <td class="col-1">
-          <i class="fas fa-trash-alt cog select" id="{{task.id}}"></i>
-      </td>
-      <td class="col-2">
-          <i class="fas fa-edit cog" id="{{task.id}}_{{story.id}}"></i>
-      </td>
-      {% else %}
-      <td scope="col" class="col-1"></td>
-      <td scope="col" class="col-2"></td>
-      {% endif %}
-    </tr>
+    {% for task,time in tasks_times %}
+        <tr class="d-flex" id="row_{{task.id}}">
+          <th scope="row">{{ forloop.counter }}</th>
+          <td class="col-12">{{task.description}}</td>
+          <td class="col-2">{{task.timeCost}}</td>
+          <td class="col-2">{{time}}</td>
+          <td class="col-2">{{task.assignedUser}}</td>
+          <td class="col-2">{{task.userConfirmed}}</td>
+          {% if user_is_product_owner == False and task.userConfirmed != 'accepted' and time == 0  %}
+          <td class="col-1">
+              <i class="fas fa-trash-alt cog select" id="{{task.id}}"></i>
+          </td>
+          <td class="col-2">
+              <i class="fas fa-edit cog" id="{{task.id}}_{{story.id}}"></i>
+          </td>
+          {% else %}
+          <td scope="col" class="col-1"></td>
+          <td scope="col" class="col-2"></td>
+          {% endif %}
+        </tr>
     {% endfor %}
   </tbody>
 </table>
@@ -203,7 +203,7 @@ $(document).ready(function() {
     -->
 
 
-    
+
 
   </div>
 {% endblock %}

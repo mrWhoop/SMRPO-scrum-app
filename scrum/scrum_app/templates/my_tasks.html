@@ -31,6 +31,11 @@
 											<div class="mb-2">
 						    					Time cost: {{ task.timeCost }}<br>
 						    				</div>
+											<div class="mb-2">
+												{% if task.userConfirmed == 'accepted' %}
+						    						<a href="/task?id={{ task.id }}" style="color:blue">Do some work</a>
+												{% endif %}
+						    				</div>
 						    				<div class="row">
 						    					<div class="col">
 						    						<div style="cursor: initial;" data-value="{{ task.id }}" class="task_{{ task.id }} text-success btn {% if user.id != task.assignedUser_id or task.userConfirmed == 'pending' %} d-none {% endif %}">Accepted</div>

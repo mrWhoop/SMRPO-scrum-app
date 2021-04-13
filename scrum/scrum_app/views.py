@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.contrib.auth.forms import  AuthenticationForm
 from django.contrib.auth import get_user_model
-from .models import Sprint, Story, Project, DevTeamMember, Task, LastLogin, Post
+from .models import Sprint, Story, Project, DevTeamMember, Task, LastLogin, Post, TimeSpent
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.urls import reverse_lazy
@@ -125,6 +125,14 @@ def story(request):
         story_id = request.GET.get('id')
         story = Story.objects.get(id=story_id)
         tasks = Task.objects.filter(story=story)
+        times = []
+        
+        for task in tasks:
+            curr_time = 0
+            for time in task.timeSpent:
+                curr_time += time.time_spent
+            times.append(round(curr_time/3600,3))
+        print(times)
         sprint = story.sprint
         sprint_active = True
 
@@ -136,8 +144,8 @@ def story(request):
         product_owner = project.product_owner
         if request.user == product_owner:
             user_is_product_owner = True
-        
-        return render(request,'story.html', context={'story':story,'tasks':tasks, 'sprint_active':sprint_active,'user_is_product_owner':user_is_product_owner})
+        zipped = zip(tasks, times)
+        return render(request,'story.html', context={'story':story,'tasks':tasks, 'sprint_active':sprint_active,'user_is_product_owner':user_is_product_owner, 'tasks_times':zipped})
     else:
         return HttpResponseRedirect('/login')
 
@@ -520,36 +528,7 @@ def delete_task(request, story_id, task_id):
       return HttpResponseRedirect('/login/')  
 
 
-def update_task(request,id):
-    if request.user.is_authenticated:
-        task = Task.objects.get(id=id)
-        story = task.story
-        project = story.project
-        dev_team_members = project.getDevTeamMembers()
-        scrum_master = project.scrum_master
-        if request.is_ajax and request.method == 'POST':
-            if (request.user in dev_team_members or request.user == scrum_master) and task.userConfirmed != 'accepted':
-                new_description = request.POST["description"]
-                new_timeCost = request.POST["time_cost"]
-                new_assignedUser = request.POST["assignedUser"]
-                task.description = new_description
-                task.time_cost = new_timeCost
-                if new_assignedUser != 'None':
-                    task.assignedUser = User.objects.get(username=new_assignedUser)
-                task.save()
-                return HttpResponseRedirect('/project/story/?id='+str(story.id))
-            else:
-                if(request.user not in dev_team_members and request.user != scrum_master):
-                    return HttpResponse({"error": True, "error_msg":"User is not dev member or scrum master",'task':task,'users':dev_team_members})
-                    #return render(request, "update_task.html", context={"error": True, "error_msg":"User is not dev member or scrum master",'task':task,'users':dev_team_members})
-                else:
-                    return HttpResponse({"error": True, "error_msg":"User is not dev member or scrum master",'task':task,'users':dev_team_members})
-                   # return render(request, "update_task.html", context={"error": True, "error_msg":"Task is already accepted",'task':task,'users':dev_team_members})
-        
-        else:
-            return render(request, "update_task.html",context={'task':task,'users':dev_team_members})
-    else:
-        return HttpResponseRedirect('/login/')
+
 
 class TaskUpdateView(BSModalUpdateView):
     model = Task
@@ -565,12 +544,16 @@ class TaskUpdateView(BSModalUpdateView):
             project = story.project
             dev_team_members = project.getDevTeamMembers()
             scrum_master = project.scrum_master
-            if (request.user in dev_team_members or request.user == scrum_master) and task.userConfirmed != 'accepted':
+            is_dev_team_member = False
+            for dev_team_member in dev_team_members:
+                if request.user == dev_team_member.userId:
+                    is_dev_team_member = True
+            if (is_dev_team_member or request.user == scrum_master) and task.userConfirmed != 'accepted' :
                 new_description = request.POST["description"]
                 new_timeCost = request.POST["time_cost"]
                 new_assignedUser = request.POST["assignedUser"]
                 task.description = new_description
-                task.time_cost = new_timeCost
+                task.timeCost = new_timeCost
                 if new_assignedUser != 'None':
                     task.assignedUser = User.objects.get(username=new_assignedUser)
                     task.userConfirmed = 'pending'
@@ -594,4 +577,77 @@ class TaskUpdateView(BSModalUpdateView):
             return render(request, "update_task.html",context={'task':task,'users':dev_team_members})
         else:
             return HttpResponseRedirect('/login/')
+
+def logTime(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            # updating time done on task from stopwatch
+            # to be changes on form submision
+
+            today = datetime.date.today()
+
+            taskId = request.POST['id']
+            time = request.POST['time']
+
+            task = Task.objects.get(pk=taskId)
+            timeSpent = TimeSpent.objects.filter(task=task, date=today)
+
+            if len(timeSpent) == 0:
+                timeSpent = TimeSpent(task=task, date=today, time_spent=time)
+                timeSpent.save()
+            else:
+                timeSpent = timeSpent[0]
+                timeSpent.time_spent = timeSpent.time_spent + int(time)
+                timeSpent.save()
+
+            times = TimeSpent.objects.filter(task=task)
+
+            for time in times:
+                remain = int(time.time_spent)
+                hours = int(remain / 3600)
+                remain -= hours * 3600
+                mins = int(remain / 60)
+                remain -= mins * 60
+                secs = remain
+
+                hours = str(hours)
+                if len(hours) < 2:
+                    hours = '0' + hours
+                mins = str(mins)
+                if len(mins) < 2:
+                    mins = '0' + mins
+                secs = str(secs)
+                if len(secs) < 2:
+                    secs = '0' + secs
+
+                time.time_spent = hours + ':' + mins + ':' + secs
+
+            return render(request, "log_time.html", context={'task': task, 'times': times})
+        else:
+            task = Task.objects.get(pk=request.GET.get('id'))
+            times = TimeSpent.objects.filter(task=task)
+
+            for time in times:
+                remain = int(time.time_spent)
+                hours = int(remain / 3600)
+                remain -= hours * 3600
+                mins = int(remain / 60)
+                remain -= mins * 60
+                secs = remain
+
+                hours = str(hours)
+                if len(hours) < 2:
+                    hours = '0' + hours
+                mins = str(mins)
+                if len(mins) < 2:
+                    mins = '0' + mins
+                secs = str(secs)
+                if len(secs) < 2:
+                    secs = '0' + secs
+
+                time.time_spent = hours + ':' + mins + ':' + secs
+
+            return render(request, "log_time.html", context={'task': task, 'times': times})
+    else:
+        return HttpResponseRedirect('/login/')
 
