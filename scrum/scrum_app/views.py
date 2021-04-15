@@ -76,6 +76,10 @@ def project(request):
 
         ended_sprints = Sprint.objects.filter(project=project).filter(end__lte=today)
 
+        completed_storyes = {story for story in Story.objects.all() if Task.objects.filter(story_id=story.id).filter(done=True).count() == Task.objects.filter(story_id=story.id).count()}
+
+        print(completed_storyes)
+
         velocityLeft = 0
         if len(sprints) < 1:
             sprints = None
@@ -115,7 +119,8 @@ def project(request):
                     StoryObject.save()
 
 
-        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints, 'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts, 'ended_sprints': ended_sprints})
+        return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints,
+                               'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts, 'ended_sprints': ended_sprints, "completed_storyes":completed_storyes})
     else:
         return HttpResponseRedirect('/login')
 

@@ -103,23 +103,27 @@
                     <div>Comment:
                     {{story.comment}}</div>
                     <div>
-                        {% if not notProductOwner and story.sprint in ended_sprints %}
+                        {% if not notProductOwner and story.sprint in ended_sprints and story in completed_storyes %}
 
                             <div class="mb-3">
                                 <label for="status_{{ story.id }}">Development status:</label>
                                 <select name="status_{{ story.id }}">
-                                    <option value="new">New</option>
-                                    <option value="in_progress">In progress</option>
-                                    <option value="incomplete">Incomplete</option>
-                                    <option value="accepted">Accepted</option>
-                                    <option value="rejected">Rejected</option>
+                                    <option {% if story.developmentStatus == "new" %} selected {% endif %} value="new">New</option>
+                                    <option {% if story.developmentStatus == "in_progress" %} selected {% endif %} value="in_progress">In progress</option>
+                                    <option {% if story.developmentStatus == "incomplete" %} selected {% endif %} value="incomplete">Incomplete</option>
+                                    <option {% if story.developmentStatus == "accepted" %} selected {% endif %} value="accepted">Accepted</option>
+                                    <option {% if story.developmentStatus == "rejected" %} selected {% endif %} value="rejected">Rejected</option>
                                 </select>
                             </div>
 
                         {% else %}
                         
                             Development status:
-                            {{story.developmentStatus}}
+                            {% if story.developmentStatus == "new" %} New {% endif %}
+                            {% if story.developmentStatus == "in_progress" %} In progress {% endif %}
+                            {% if story.developmentStatus == "incomplete" %} Incomplete {% endif %}
+                            {% if story.developmentStatus == "accepted" %} Accepted {% endif %}
+                            {% if story.developmentStatus == "rejected" %} Rejected {% endif %}
 
                         {% endif %}
 

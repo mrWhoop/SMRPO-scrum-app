@@ -31,20 +31,25 @@
 											<div class="mb-2">
 						    					Time cost: {{ task.timeCost }}<br>
 						    				</div>
-											<div class="mb-2">
-												{% if task.userConfirmed == 'accepted' %}
-						    						<a href="/task?id={{ task.id }}" style="color:blue">Do some work</a>
-												{% endif %}
-						    				</div>
 						    				<div class="row">
-						    					<div class="col">
+						    					<div class="col mt-2">
 						    						<div style="cursor: initial;" data-value="{{ task.id }}" class="task_{{ task.id }} text-success btn {% if user.id != task.assignedUser_id or task.userConfirmed == 'pending' %} d-none {% endif %}">Accepted</div>
 						    						<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-success {% if task.userConfirmed == 'accepted'   %} d-none {% endif %}">Accept</div>
 						    					</div>
-						    					<div class="col">
-													
+						    					<div class="col mt-2">
 													<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if task.userConfirmed == 'free' or task.userConfirmed == 'rejected'  or task.userConfirmed != 'accepted' %} d-none {% endif %}">Reject</div>
 						    					</div>
+						    					{% if task.assignedUser_id == user.id %}
+						    					<div class="mt-2 task_{{ task.id }}">
+						    						{% if task.userConfirmed == 'accepted' %}
+							    					<a class="btn btn-primary mt-2" href="/task?id={{ task.id }}">Do some work</a>
+									                <div class="form-check form-switch mt-2">
+									                  <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" name="done_{{task.id}}" {% if task.done %}checked{% endif %}>
+									                  <label class="form-check-label" for="flexSwitchCheckDefault">Done</label>
+									                </div>
+									                {% endif %}
+									            </div>
+									            {% endif %}
 						    				</div>
 						    			</div>
 						    		</div>
