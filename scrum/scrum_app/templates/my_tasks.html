@@ -25,31 +25,33 @@
 
 				    				<div class="card">
 						    			<div class="card-body">
-						    				<div>
+						    				<div class="mb-2">
 						    					Task: {{ task.description }}<br>
 						    				</div>
 											<div class="mb-2">
 						    					Time cost: {{ task.timeCost }}<br>
 						    				</div>
 						    				<div class="row">
-						    					<div class="col mt-2">
-						    						<div style="cursor: initial;" data-value="{{ task.id }}" class="task_{{ task.id }} text-success btn {% if user.id != task.assignedUser_id or task.userConfirmed == 'pending' %} d-none {% endif %}">Accepted</div>
-						    						<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-success {% if task.userConfirmed == 'accepted'   %} d-none {% endif %}">Accept</div>
-						    					</div>
-						    					<div class="col mt-2">
-													<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if task.userConfirmed == 'free' or task.userConfirmed == 'rejected'  or task.userConfirmed != 'accepted' %} d-none {% endif %}">Reject</div>
-						    					</div>
-						    					{% if task.assignedUser_id == user.id %}
-						    					<div class="mt-2 task_{{ task.id }}">
-						    						{% if task.userConfirmed == 'accepted' %}
-							    					<a class="btn btn-primary mt-2" href="/task?id={{ task.id }}">Do some work</a>
-									                <div class="form-check form-switch mt-2">
-									                  <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" name="done_{{task.id}}" {% if task.done %}checked{% endif %}>
+						    					<div class="btns_{{task.id}} col {% if task.done %} d-none {% endif %}">
+						    						<div class="row">
+								    					<div class="col mt-2">
+								    						<div style="cursor: initial;" data-value="{{ task.id }}" class="task_{{ task.id }} text-success btn {% if user.id != task.assignedUser_id or task.userConfirmed == 'pending' %} d-none {% endif %}">Accepted</div>
+								    						<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-success {% if task.userConfirmed == 'accepted' %} d-none {% endif %}">Accept</div>
+								    					</div>
+								    					<div class="col mt-2">
+															<div data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if task.userConfirmed == 'free' or task.userConfirmed == 'rejected'  or task.userConfirmed != 'accepted' %} d-none {% endif %}">Reject</div>
+								    					</div>
+							    					</div>
+						    						<div class="col pt-3">
+								    					<a class="btn btn-primary mt-1 task_{{ task.id }} {% if task.userConfirmed != 'accepted' %} d-none {% endif %}" href="/task?id={{ task.id }}">Do some work</a>
+								    				</div>
+							    				</div>
+						    					<div class="mt-2">
+									                <div class="done_{{task.id}} form-check form-switch mt-2 {% if task.userConfirmed != 'accepted' and task.assignedUser_id != user.id %} d-none {% endif %}">
+									                  <input class="form-check-input checkbox_click" data-value="{{ task.id }}" type="checkbox" id="flexSwitchCheckDefault" name="done" {% if task.done %}checked{% endif %}>
 									                  <label class="form-check-label" for="flexSwitchCheckDefault">Done</label>
 									                </div>
-									                {% endif %}
-									            </div>
-									            {% endif %}
+										        </div>
 						    				</div>
 						    			</div>
 						    		</div>
@@ -85,6 +87,23 @@
 			data : {task_id: task_id, userConfirmed: userConfirmed}
 		}).done(function(result) {
 			$(".task_"+result).toggleClass("d-none");
+			$(".done_"+result).toggleClass("d-none");
+		});
+
+	});
+
+	$(".my_tasks_list .checkbox_click").change(function() {
+
+		var task_id = $(this).data("value");
+		var done = $(this).is(':checked');
+
+		$.ajax({
+			type: "POST",
+			headers: { "X-CSRFToken":  token },
+			url: "/ajax/task/doneupdate/",
+			data : {task_id: task_id, done: done}
+		}).done(function(result) {
+			$(".btns_"+result).toggleClass("d-none");
 		});
 
 	});

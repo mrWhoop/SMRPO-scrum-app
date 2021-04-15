@@ -423,9 +423,6 @@ def update_task_asign(request):
         if request.method == 'POST':
             task_id = request.POST['task_id']
             userConfirmed = request.POST['userConfirmed']
-
-            #print("OUT: ", userConfirmed, file=sys.stderr)
-
             task = Task.objects.get(id=int(task_id))
             if userConfirmed == "Accept":
                 task.userConfirmed = 'accepted'
@@ -437,7 +434,17 @@ def update_task_asign(request):
 
     return HttpResponse(task_id)
 
+def update_task_done(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            task_id = request.POST['task_id']
+            done = request.POST['done']
+            print(done)
+            task = Task.objects.get(id=int(task_id))
+            task.done = done == "true"
+            task.save()
 
+    return HttpResponse(task_id)
 
 
 def new_post_form(request):
