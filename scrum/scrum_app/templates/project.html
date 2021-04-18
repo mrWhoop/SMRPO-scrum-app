@@ -48,6 +48,15 @@
             }, 1500);
         });
 
+        $(".select_status").change(function() {
+            if(this.value=="rejected" ){
+                $(this).parent().parent().parent().find(".comment").removeClass("d-none");
+            }
+            if(this.value=="accepted" ){
+                $(this).parent().parent().parent().find(".comment").addClass("d-none");
+            }
+        });
+
     });
 
     
@@ -96,21 +105,18 @@
                     Time cost: {{ story.timeCost }} h
                     {% endif %}
             
-            
-            
                     <div>Time spent:
                     {{story.timeSpent}} h</div>
-                    <div>Comment:
-                    {{story.comment}}</div>
+
                     <div>
                         {% if not notProductOwner and story.sprint in ended_sprints and story in completed_storyes %}
 
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <label for="status_{{ story.id }}">Development status:</label>
-                                <select name="status_{{ story.id }}">
-                                    <option {% if story.developmentStatus == "new" %} selected {% endif %} value="new">New</option>
-                                    <option {% if story.developmentStatus == "in_progress" %} selected {% endif %} value="in_progress">In progress</option>
-                                    <option {% if story.developmentStatus == "incomplete" %} selected {% endif %} value="incomplete">Incomplete</option>
+                                <select name="status_{{ story.id }}" class="select_status status_{{ story.id }}">
+                                    <!--option {% if story.developmentStatus == "new" %} selected {% endif %} value="new">New</option-->
+                                    <!--option {% if story.developmentStatus == "in_progress" %} selected {% endif %} value="in_progress">In progress</option-->
+                                    <!--option {% if story.developmentStatus == "incomplete" %} selected {% endif %} value="incomplete">Incomplete</option-->
                                     <option {% if story.developmentStatus == "accepted" %} selected {% endif %} value="accepted">Accepted</option>
                                     <option {% if story.developmentStatus == "rejected" %} selected {% endif %} value="rejected">Rejected</option>
                                 </select>
@@ -128,6 +134,17 @@
                         {% endif %}
 
                     </div>
+
+                    {% if not notProductOwner and story.sprint in ended_sprints and story in completed_storyes %}
+                        <div class="mb-3 comment {% if story.developmentStatus == 'accepted' %} d-none {% endif%}">
+                            <label class="form-label" for="comment_{{ story.id }}">Comment:</label>
+                            <textarea class="form-control" rows="3" type="textfield" name="comment_{{ story.id }}">{{story.comment}}</textarea>
+                        </div>
+                    {% elif story.developmentStatus != 'accepted' %}
+                        <div>Comment:
+                            {{story.comment}}
+                        </div>
+                    {% endif %}
             
                     {% if story.sprint == None and story.timeCost != None and story.developmentStatus != 'accepted' and notProductOwner%}
             

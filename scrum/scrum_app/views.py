@@ -118,6 +118,11 @@ def project(request):
                     StoryObject.developmentStatus = value
                     StoryObject.save()
 
+                if field == 'comment' and value != 'None':
+                    StoryObject = Story.objects.get(id=int(story_id))
+                    StoryObject.comment = value
+                    StoryObject.save()
+
 
         return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints,
                                'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts, 'ended_sprints': ended_sprints, "completed_storyes":completed_storyes})
