@@ -328,11 +328,9 @@ def new_sprint_form(request):
         if request.method == 'POST':
             project_id = request.POST['project']
             start = request.POST['start']
-            start = datetime.datetime.strptime(start, '%Y-%m-%d')
-            start = utc.localize(start)
+            start = datetime.datetime.strptime(start, '%Y-%m-%d').date()
             end = request.POST['end']
-            end = datetime.datetime.strptime(end, '%Y-%m-%d')
-            end = utc.localize(end)
+            end = datetime.datetime.strptime(end, '%Y-%m-%d').date()
             speed = request.POST['speed']
             # get all sprints on a project and check end date against starting date
             project = Project.objects.get(id=project_id)
@@ -670,3 +668,98 @@ def logTime(request):
     else:
         return HttpResponseRedirect('/login/')
 
+def sprints(request):
+    if request.user.is_authenticated:
+        project = Project.objects.get(pk=request.GET.get('id'))
+        today = datetime.date.today()
+        sprint = Sprint.objects.filter(project_id=request.GET.get('id')).filter(start__gte=today)
+        return render(request, "sprints.html", context={'project': project, 'sprints': sprint})
+
+    else:
+        return HttpResponseRedirect('/login/')
+
+def editSprint(request):
+    if request.user.is_authenticated:
+        utc = pytz.UTC
+
+        success = False
+        start_overlapping = False
+        startBigger = False
+        minEndDate = (datetime.date.today() + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+        minStartDate = datetime.date.today().strftime("%Y-%m-%d")
+
+        user = get_user_model().objects.get(id=request.user.id)
+        projects = Project.objects.filter(scrum_master=user)
+
+        if request.method == 'POST':
+            project_id = request.POST['projectId']
+            sprint_id = request.POST['sprintId']
+            changeSprint = Sprint.objects.get(pk=sprint_id)
+            start = request.POST['start']
+            start = datetime.datetime.strptime(start, '%Y-%m-%d').date()
+            end = request.POST['end']
+            end = datetime.datetime.strptime(end, '%Y-%m-%d').date()
+            speed = request.POST['speed']
+            # get all sprints on a project and check end date against starting date
+            project = Project.objects.get(id=project_id)
+            sprints = Sprint.objects.filter(project=project)
+            for sprint in sprints:
+                if sprint.id == changeSprint.id:
+                    continue
+                else:
+                    print(sprint.id, changeSprint.id)
+                    sprintEnd = sprint.end
+                    sprintStart = sprint.start
+                    if sprintEnd >= start and sprintStart <= start:
+                        start_overlapping = True
+                        return render(request, 'edit_sprint.html', context={'projects': projects,
+                                                                            'project': project,
+                                                                            'minStartDate': minStartDate,
+                                                                            'minEndDate': minEndDate,
+                                                                            'startDateOverlapping': start_overlapping,
+                                                                            'startBigger': startBigger,
+                                                                            'sprint': sprint,
+                                                                            'speedField': sprint.expectedSpeed,
+                                                                            'success': success
+                                                                            })
+                    if start > end:
+                        startBigger = True
+                        return render(request, 'edit_sprint.html', context={'projects': projects,
+                                                                            'project': project,
+                                                                            'minStartDate': minStartDate,
+                                                                            'minEndDate': minEndDate,
+                                                                            'startDateOverlapping': start_overlapping,
+                                                                            'startBigger': startBigger,
+                                                                            'sprint': sprint,
+                                                                            'speedField': sprint.expectedSpeed,
+                                                                            'success': success,
+                                                                            })
+
+            # add sprint
+
+            changeSprint.start = start
+            changeSprint.end = end
+            changeSprint.expectedSpeed = speed
+            changeSprint.save()
+            success = True
+
+            redirectUrl = "/sprints?id=" + str(project.id)
+
+            return redirect(redirectUrl)
+
+        sprint = Sprint.objects.get(pk=request.GET.get('id'))
+
+        sprint.start = sprint.start.strftime("%Y-%m-%d")
+        sprint.end = sprint.end.strftime("%Y-%m-%d")
+
+        project = Project.objects.get(pk=sprint.project_id)
+
+        return render(request, 'edit_sprint.html', context={'projects': projects,
+                                                            'project': project,
+                                                            'minStartDate': minStartDate,
+                                                            'minEndDate': minEndDate,
+                                                            'sprint': sprint,
+                                                            'speedField': sprint.expectedSpeed,
+                                                            'success': success})
+    else:
+        return HttpResponseRedirect('/login')

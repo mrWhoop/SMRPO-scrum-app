@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h4 class="title">Sprint</h4>
+<form id="edit-sprint-form" method="post"
+action="{% url 'edit_sprint' %}" class="col-4">
+    {% csrf_token %}
+	<div class="mb-3">
+        <input name="projectId" type="text" value="{{project.id}}" hidden>
+        <input name="sprintId" type="text" value="{{sprint.id}}" hidden>
+		<label class="form-label" for="start">Starting on:</label>
+		<input class="form-control" type="date" name="start" min="{{minStartDate}}" value="{{sprint.start}}" required>
+        {% if startDateOverlapping == True %}
+        </br>
+        <p class="text-success">
+            Start cannot be set during an existing sprint!
+        </p>
+        {% endif %}
+        {% if startBigger == True %}
+        </br>
+        <p class="text-success">
+            Start date cannot be set later in time than the begining!
+        </p>
+        {% endif %}
+	</div>
+	<div class="mb-3">
+        <label class="form-label" for="end">Ending on:</label>
+		<input class="form-control" type="date" name="end" min="{{minEndDate}}" value="{{sprint.end}}" required>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="speed">Velocity:</label>
+		<input class="form-control" type="number" name="speed" value="{{speedField}}" min="0"  required>
+	</div>
+    <div class="mb-3"></div>
+    <input type="submit" value="Confirm changes"
+                       class="btn btn-primary pull-right float_button" />
+    {% if success == True %}
+    </br>
+    <p class="text-success">
+        Sprint modified succesfuly!
+    </p>
+    {% endif %}
+
+</form>
+
+{% endblock %}

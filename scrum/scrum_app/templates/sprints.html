@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h4 class="title">Project: {{ project.projectName }}</h4>
+<div  class="col-4">
+<h5 >Sprint list:</h5>
+
+<table id="tasks-table" class="table table-hover">
+  <thead>
+    <tr class="d-flex">
+      <th scope="col" style="width:23px;">#</th>
+      <th scope="col" class="col-6 align-self-baseline">Start</th>
+      <th scope="col" class="col-6 align-self-baseline">Stop</th>
+      <th scope="col" class="col-2 align-self-baseline">Velocity</th>
+      <th scope="col" class="col-2 align-self-baseline"><br></th>
+      <th scope="col" class="col-2 align-self-baseline"><br></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for spr in sprints %}
+        <tr class="d-flex" id="row_{{task.id}}">
+          <th scope="row" style="width:25px;">{{ forloop.counter }}</th>
+          <td class="col-6">{{spr.start}}</td>
+          <td class="col-6">{{spr.end}}</td>
+          <td class="col-2">{{spr.expectedSpeed}}</td>
+          <td scope="col" class="col-2"><a href="editSprint?id={{spr.id}}" style="color:blue">Edit</a></td>
+          <td scope="col" class="col-2"></td>
+        </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content"></div>
+  </div>
+</div>
+</div>
+{% endblock %}

@@ -66,6 +66,9 @@
 
 <h6>Product owner: {{project.product_owner}}</h6>
 <h6>Scrum Master: {{project.scrum_master}}</h6><br>
+{% if isScrumMaster %}
+    <h6><a href="/sprints?id={{project.id}}" style="color:blue">Sprints</a></h6><br>
+{% endif %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-6">

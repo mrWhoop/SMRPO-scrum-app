@@ -44,9 +44,9 @@ class DevTeamMember(models.Model):
 
 class Sprint(models.Model):
 
-    start = models.DateTimeField()
+    start = models.DateField()
 
-    end = models.DateTimeField()
+    end = models.DateField()
 
     expectedSpeed = models.IntegerField()
 
