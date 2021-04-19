@@ -96,18 +96,6 @@
                     <div>Business value:
                     {{story.businessValue}}</div>
             
-            
-                    {% if story.sprint == None and isScrumMaster %}
-                    <div class="mb-3">
-                        <div>
-                            <label class="form-label" for="time_cost">Estimated time:</label>
-                            <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
-                        </div>
-                    </div>
-                    {% else %}
-                    Time cost: {{ story.timeCost }} h
-                    {% endif %}
-            
                     <div>Time spent:
                     {{story.timeSpent}} h</div>
 
@@ -134,6 +122,17 @@
                             {% if story.developmentStatus == "accepted" %} Accepted {% endif %}
                             {% if story.developmentStatus == "rejected" %} Rejected {% endif %}
 
+                        {% endif %}
+
+                        {% if story.sprint == None or story.sprint in ended_sprints and isScrumMaster  %}
+                            <div class="mb-3">
+                                <div>
+                                    <label class="form-label" for="time_cost">Estimated time:</label>
+                                    <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
+                                </div>
+                            </div>
+                        {% else %}
+                            Time cost: {{ story.timeCost }} h
                         {% endif %}
 
                     </div>
