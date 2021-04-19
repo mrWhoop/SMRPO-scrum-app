@@ -147,7 +147,7 @@ def story(request):
         sprint_active = True
 
         utc = pytz.UTC
-        if sprint == None or utc.localize(datetime.datetime.today()) > sprint.end:
+        if sprint == None or datetime.datetime.today().date() > sprint.end:
             sprint_active = False
         
         project = story.project
