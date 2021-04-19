@@ -707,7 +707,6 @@ def editSprint(request):
                 if sprint.id == changeSprint.id:
                     continue
                 else:
-                    print(sprint.id, changeSprint.id)
                     sprintEnd = sprint.end
                     sprintStart = sprint.start
                     if sprintEnd >= start and sprintStart <= start:
