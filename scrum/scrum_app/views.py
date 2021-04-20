@@ -19,7 +19,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from bootstrap_modal_forms.generic import BSModalUpdateView
-from .forms import TaskModelForm
+from .forms import TaskModelForm, StoryModelForm
 from django.template.loader import render_to_string
 
 
@@ -543,6 +543,72 @@ def delete_task(request, story_id, task_id):
       return HttpResponseRedirect('/login/')  
 
 
+def delete_story(request, story_id):
+    if request.user.is_authenticated:
+        story = Story.objects.get(id=story_id)
+        project = story.project
+        product_owner = project.product_owner
+        scrum_master = project.scrum_master
+        
+        if (request.user == product_owner or request.user == scrum_master) and story.developmentStatus != 'done' and story.sprint == None:
+            story.delete()
+            return JsonResponse({"text":"text"}, status=200, safe=False)
+        else:
+            if(request.user != product_owner and request.user != scrum_master):
+                return JsonResponse({"errorMsg": "User is not product owner or scrum master"}, status=400)
+            else:
+                return JsonResponse({"errorMsg": "Story is already part of sprint or done"}, status=400)
+        
+    else:
+      return HttpResponseRedirect('/login/')  
+
+class StoryUpdateView(BSModalUpdateView):
+    model = Story
+    template_name = 'update_story.html'
+    form_class= StoryModelForm
+    success_message = 'Succes: Story was updated.'
+    success_url = reverse_lazy('index')
+
+    def get(self,request,pk):
+        if request.user.is_authenticated:
+            story = Story.objects.get(pk=pk)
+            project = story.project
+            return render(request, "update_story.html",context={'story':story})
+        else:
+            return HttpResponseRedirect('/login/')
+    
+    def post(self,request,pk):
+        if request.user.is_authenticated:
+            story = Story.objects.get(pk=pk)
+            project = story.project
+            product_owner = project.product_owner
+            scrum_master = project.scrum_master
+            if (request.user == product_owner or request.user == scrum_master) and story.developmentStatus != 'done' and story.sprint == None:
+                new_description = request.POST["description"]
+                new_name = request.POST["story_name"]
+                new_priority = request.POST["story_priority"]
+                new_bussines_value = request.POST["story_bussines_value"]
+                new_comment = request.POST["comment"]
+                
+                stories = Story.objects.filter(name__iexact=new_name)
+                if len(stories) > 0:
+                    name_exists = True
+
+                if new_name != story.name and name_exists == True:
+                    pass
+                else:
+                    story.name = new_name
+                    story.description = new_description
+                    story.priority = new_priority
+                    story.businessValue = new_bussines_value
+                    story.comment = new_comment
+                    story.save()
+                    return HttpResponseRedirect('/project/?id='+str(project.id))
+
+            else:
+                HttpResponse("<div class='.invalid'></div>")
+        else:
+            return HttpResponseRedirect('/login/')
 
 
 class TaskUpdateView(BSModalUpdateView):
