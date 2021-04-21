@@ -27,6 +27,12 @@ action="{% url 'edit_sprint' %}" class="col-4">
 	<div class="mb-3">
         <label class="form-label" for="end">Ending on:</label>
 		<input class="form-control" type="date" name="end" min="{{minEndDate}}" value="{{sprint.end}}" required>
+        {% if end_overlapping == True %}
+        </br>
+        <p class="text-success">
+            End cannot be set during an existing sprint!
+        </p>
+        {% endif %}
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="speed">Velocity:</label>

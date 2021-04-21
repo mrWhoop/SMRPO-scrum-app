@@ -155,7 +155,7 @@ def story(request):
         if request.user == product_owner:
             user_is_product_owner = True
         zipped = zip(tasks, times)
-        return render(request,'story.html', context={'story':story,'tasks':tasks, 'sprint_active':sprint_active,'user_is_product_owner':user_is_product_owner, 'tasks_times':zipped})
+        return render(request,'story.html', context={'story': story, 'tasks': tasks, 'sprint_active': sprint_active, 'user_is_product_owner': user_is_product_owner, 'tasks_times': zipped})
     else:
         return HttpResponseRedirect('/login')
 
@@ -711,26 +711,45 @@ def editSprint(request):
                     sprintStart = sprint.start
                     if sprintEnd >= start and sprintStart <= start:
                         start_overlapping = True
+                        changeSprint.start = start.strftime("%Y-%m-%d")
+                        changeSprint.end = end.strftime("%Y-%m-%d")
                         return render(request, 'edit_sprint.html', context={'projects': projects,
                                                                             'project': project,
                                                                             'minStartDate': minStartDate,
                                                                             'minEndDate': minEndDate,
                                                                             'startDateOverlapping': start_overlapping,
                                                                             'startBigger': startBigger,
-                                                                            'sprint': sprint,
-                                                                            'speedField': sprint.expectedSpeed,
+                                                                            'sprint': changeSprint,
+                                                                            'speedField': changeSprint.expectedSpeed,
+                                                                            'success': success
+                                                                            })
+                    if sprintEnd >= end and sprintStart <= end:
+                        end_overlapping = True
+                        changeSprint.start = start.strftime("%Y-%m-%d")
+                        changeSprint.end = end.strftime("%Y-%m-%d")
+                        return render(request, 'edit_sprint.html', context={'projects': projects,
+                                                                            'project': project,
+                                                                            'minStartDate': minStartDate,
+                                                                            'minEndDate': minEndDate,
+                                                                            'startDateOverlapping': start_overlapping,
+                                                                            'startBigger': startBigger,
+                                                                            'sprint': changeSprint,
+                                                                            'end_overlapping': end_overlapping,
+                                                                            'speedField': changeSprint.expectedSpeed,
                                                                             'success': success
                                                                             })
                     if start > end:
                         startBigger = True
+                        changeSprint.start = start.strftime("%Y-%m-%d")
+                        changeSprint.end = end.strftime("%Y-%m-%d")
                         return render(request, 'edit_sprint.html', context={'projects': projects,
                                                                             'project': project,
                                                                             'minStartDate': minStartDate,
                                                                             'minEndDate': minEndDate,
                                                                             'startDateOverlapping': start_overlapping,
                                                                             'startBigger': startBigger,
-                                                                            'sprint': sprint,
-                                                                            'speedField': sprint.expectedSpeed,
+                                                                            'sprint': changeSprint,
+                                                                            'speedField': changeSprint.expectedSpeed,
                                                                             'success': success,
                                                                             })
 
