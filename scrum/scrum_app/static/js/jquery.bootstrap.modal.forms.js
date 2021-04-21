@@ -9,6 +9,7 @@ https://github.com/trco/django-bootstrap-modal-forms
 
     // Open modal & load the form at formURL to the modalContent element
     var modalForm = function (settings) {
+        console.log(settings.modalContent)
         $(settings.modalID).find(settings.modalContent).load(settings.formURL, function () {
             $(settings.modalID).modal("show");
             $(settings.modalForm).attr("action", settings.formURL);
@@ -106,7 +107,23 @@ https://github.com/trco/django-bootstrap-modal-forms
                                 }
                             },
                             error: function (response) {
-                                console.log(response)
+                                /*console.log(response)
+                                $(asyncSettings.dataElementId).html(response[asyncSettings.dataKey]);
+    
+                                // Add modalForm to trigger element after async page update
+                                if (asyncSettings.addModalFormFunction) {
+                                    asyncSettings.addModalFormFunction();
+                                }
+    
+                                //if (asyncSettings.closeOnSubmit) {
+                                  //  $(settings.modalID).modal("hide");
+                                //} else {
+                                    // Reload form
+                                    $(settings.modalID).find(settings.modalContent).load(settings.formURL, function () {
+                                        $(settings.modalForm).attr("action", settings.formURL);
+                                        addEventHandlers(settings);
+                                    });
+                                //}*/
                             }
                         });
                     }
@@ -170,6 +187,7 @@ https://github.com/trco/django-bootstrap-modal-forms
         var settings = $.extend(defaults, options);
 
         this.each(function () {
+            
             // Add click event handler to the element with attached modalForm
             $(this).click(function (event) {
                 // Instantiate new form in modal

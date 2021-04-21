@@ -18,6 +18,8 @@ urlpatterns = [
     url(r'^new_sprint/$', views.new_sprint_form, name='new_sprint_form'),
     url(r'^project/$', views.project, name='project'),
     url(r'^project/story/$', views.story, name='story'),
+    url(r'^project/delete_story/(?P<story_id>.*)$', views.delete_story, name='delete_story'),
+    url(r'^project/update_story/(?P<pk>\d+)/$', views.StoryUpdateView.as_view(), name='update_story'),
     url(r'^project/story/new_task/$', views.new_task_form, name='new_task_form'),
     url(r'^my_tasks/$', views.my_tasks, name='my_tasks'),
     url(r'^task/$', views.logTime, name='log_time'),
@@ -31,4 +33,5 @@ urlpatterns = [
     url(r'^change_password/$', views.change_password, name='change_password'),
     url(r'^project/story/(?P<story_id>.*)/delete/(?P<task_id>.*)$', views.delete_task, name='delete_task'),
     url(r'^project/story/update_task/(?P<pk>\d+)/$', views.TaskUpdateView.as_view(), name='update_task'),
+
 ]

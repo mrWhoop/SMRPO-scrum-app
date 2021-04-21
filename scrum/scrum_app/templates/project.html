@@ -2,7 +2,8 @@
 {% load static %}
 {% block content %}
 
-<script type="text/javascript">
+{% block javascript %}
+<script>
     $(document).ready(function() {
         $("#new-post-form").submit(function(e){
             e.preventDefault()
@@ -57,10 +58,49 @@
             }
         });
 
+        $(".fa-trash-alt").click(function(){
+            var id = this.id
+            $.ajax({
+                type: 'DELETE',
+                url: `/project/delete_story/${id}`,
+                dataType: 'json',
+                beforeSend: function (xhr) {
+                                xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
+                success: function(response){
+                    console.log(`#card_${id}`)
+                    $(`#card_${id}`).remove()
+                },
+                error: function(response){
+                    alertify.alert(response["responseJSON"]["errorMsg"])
+                }
+            })
+        });
+
+        function updateStoryModalForm(){
+            $(".fa-edit").each(function(){
+                var storyId = this.id;
+                $(this).modalForm({
+                    formURL : `/project/update_story/${storyId}/`,
+                    /*asyncUpdate: false,
+                    asyncSettings:{
+                    closeOnSubmit:true,
+                    successMessage: [],
+                    dataUrl: `/project/?id=1`,
+                    dataElementId: `#card_${storyId}`,
+                    dataKey: "context",
+                    addModalFormFunction: updateStoryModalForm
+                    }*/
+                })
+            });
+        }
+        updateStoryModalForm()
+
     });
 
     
-    </script>
+</script>
+{% endblock %}
 
 <h4 class="title">Project name: {{ project.projectName }}</h4>
 
@@ -86,8 +126,26 @@
             
             {% for story in stories %}
             
-            <div class="card story_cards" style="max-width: 24rem;">
-                <div class="card-header">{{story.name}}</div>
+            <div id="card_{{story.id}}" class="card story_cards" style="max-width: 24rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <strong>{{story.name}}</strong>
+                        </div>
+                        {% if isScrumMaster or not notProductOwner %} 
+                            {% if story.developmentStatus != 'done' and story.sprint == None %}
+                            <div class="col-md-2 float-right">
+                                <i class="fas fa-trash-alt cog select" id="{{story.id}}" style="margin-top: 4px; "></i>
+                                <i class="fas fa-edit cog" id="{{story.id}}" style="margin-top: 4px; margin-left: 2em;"></i>
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                      </div>
+                      
+
+                    
+                    
+                </div>
                 <div class="card-body">
                     <div>Description:
                     {{story.description}}</div>
@@ -97,17 +155,7 @@
                     {{story.businessValue}}</div>
             
             
-                    {% if story.sprint == None and isScrumMaster %}
-                    <div class="mb-3">
-                        <div>
-                            <label class="form-label" for="time_cost">Estimated time:</label>
-                            <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
-                        </div>
-                    </div>
-                    {% else %}
-                    Time cost: {{ story.timeCost }} h
-                    {% endif %}
-            
+                    
                     <div>Time spent:
                     {{story.timeSpent}} h</div>
 
@@ -134,6 +182,19 @@
                             {% if story.developmentStatus == "accepted" %} Accepted {% endif %}
                             {% if story.developmentStatus == "rejected" %} Rejected {% endif %}
 
+                        {% endif %}
+
+                        {% if story.sprint == None or story.sprint in ended_sprints and isScrumMaster  %}
+                            <div class="mb-3">
+                                <div>
+                                    <label class="form-label" for="time_cost">Estimated time (story points):</label>
+                                    <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
+                                </div>
+                            </div>
+                        {% else %}
+                        <div class="mb-3">
+                            Time cost: {{ story.timeCost }} h
+                        </div>
                         {% endif %}
 
                     </div>
@@ -221,6 +282,12 @@
         </div>
         
     </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content"></div>
+        </div>
+      </div>
 </div>
 
 {% endblock %}
