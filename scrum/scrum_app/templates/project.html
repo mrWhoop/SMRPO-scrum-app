@@ -50,11 +50,20 @@
         });
 
         $(".select_status").change(function() {
+            var story_id = $(this).attr('name').split("_")[1];
+
+
+            var comment_html = `<label class='form-label' for='comment_${story_id}'>Comment:</label>
+                                <textarea class='form-control' rows='3' type='textfield' name='comment_${story_id}' required>{{story.comment}}</textarea>`;
+
+
             if(this.value=="rejected" ){
-                $(this).parent().parent().parent().find(".comment").removeClass("d-none");
+                $(this).parent().parent().parent().find(".comment").append(comment_html);
+                //$(this).parent().parent().parent().find(".comment").removeClass("d-none");
             }
             if(this.value=="accepted" ){
-                $(this).parent().parent().parent().find(".comment").addClass("d-none");
+                $(this).parent().parent().parent().find(".comment").empty();
+                //$(this).parent().parent().parent().find(".comment").addClass("d-none");
             }
         });
 
@@ -141,9 +150,6 @@
                             {% endif %}
                         {% endif %}
                       </div>
-                      
-
-                    
                     
                 </div>
                 <div class="card-body">
@@ -160,7 +166,7 @@
                     {{story.timeSpent}} h</div>
 
                     <div>
-                        {% if not notProductOwner and story.sprint in ended_sprints and story in completed_storyes %}
+                        {% if not notProductOwner and story in completed_storyes %}
 
                             <div class="mb-2">
                                 <label for="status_{{ story.id }}">Development status:</label>
@@ -199,16 +205,12 @@
 
                     </div>
 
-                    {% if not notProductOwner and story.sprint in ended_sprints and story in completed_storyes %}
-                        <div class="mb-3 comment {% if story.developmentStatus == 'accepted' %} d-none {% endif%}">
+                     <div class="mb-3 comment">
+                        {% if not notProductOwner and story in completed_storyes and story.developmentStatus == 'rejected' %}
                             <label class="form-label" for="comment_{{ story.id }}">Comment:</label>
-                            <textarea class="form-control" rows="3" type="textfield" name="comment_{{ story.id }}">{{story.comment}}</textarea>
-                        </div>
-                    {% elif story.developmentStatus != 'accepted' %}
-                        <div>Comment:
-                            {{story.comment}}
-                        </div>
-                    {% endif %}
+                            <textarea class="form-control" rows="3" type="textfield" name="comment_{{ story.id }}" required>{{story.comment}}</textarea>
+                        {% endif %}
+                     </div>
             
                     {% if story.sprint == None and story.timeCost != None and story.developmentStatus != 'accepted' and notProductOwner%}
             
