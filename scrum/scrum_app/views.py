@@ -851,3 +851,16 @@ def editSprint(request):
                                                             'success': success})
     else:
         return HttpResponseRedirect('/login')
+
+def deleteSprint(request):
+    if request.user.is_authenticated:
+        sprint_id = request.GET.get('id')
+        project_id = request.GET.get('projid')
+        sprint = Sprint.objects.get(pk=sprint_id)
+        sprint.delete()
+
+        redirectUrl = "/sprints?id=" + str(project_id)
+
+        return redirect(redirectUrl)
+    else:
+        return HttpResponseRedirect('/login')

@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^task/$', views.logTime, name='log_time'),
     url(r'^sprints/$', views.sprints, name='sprints'),
     url(r'^sprints/editSprint$', views.editSprint, name='edit_sprint'),
+    url(r'^sprints/deleteSprint$', views.deleteSprint, name='delete_sprint'),
     url(r'^ajax/task/timeupdate/$', views.new_task_form, name='task_time_update'),
     url(r'^ajax/task/asignupdate/$', views.update_task_asign, name='task_asign_update'),
     url(r'^ajax/task/doneupdate/$', views.update_task_done, name='task_done_update'),
