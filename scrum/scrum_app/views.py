@@ -755,6 +755,7 @@ def editSprint(request):
         success = False
         start_overlapping = False
         startBigger = False
+        today = datetime.date.today().strftime("%Y-%m-%d")
         minEndDate = (datetime.date.today() + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
         minStartDate = datetime.date.today().strftime("%Y-%m-%d")
 
@@ -765,6 +766,8 @@ def editSprint(request):
             project_id = request.POST['projectId']
             sprint_id = request.POST['sprintId']
             changeSprint = Sprint.objects.get(pk=sprint_id)
+            startDate = changeSprint.start
+            stopDate = changeSprint.end
             start = request.POST['start']
             start = datetime.datetime.strptime(start, '%Y-%m-%d').date()
             end = request.POST['end']
@@ -791,7 +794,10 @@ def editSprint(request):
                                                                             'startBigger': startBigger,
                                                                             'sprint': changeSprint,
                                                                             'speedField': changeSprint.expectedSpeed,
-                                                                            'success': success
+                                                                            'success': success,
+                                                                            'today': today,
+                                                                            'startDate': startDate,
+                                                                            'stopDate': stopDate
                                                                             })
                     if sprintEnd >= end and sprintStart <= end:
                         end_overlapping = True
@@ -806,7 +812,10 @@ def editSprint(request):
                                                                             'sprint': changeSprint,
                                                                             'end_overlapping': end_overlapping,
                                                                             'speedField': changeSprint.expectedSpeed,
-                                                                            'success': success
+                                                                            'success': success,
+                                                                            'today': today,
+                                                                            'startDate': startDate,
+                                                                            'stopDate': stopDate
                                                                             })
                     if start > end:
                         startBigger = True
@@ -821,6 +830,9 @@ def editSprint(request):
                                                                             'sprint': changeSprint,
                                                                             'speedField': changeSprint.expectedSpeed,
                                                                             'success': success,
+                                                                            'today': today,
+                                                                            'startDate': startDate,
+                                                                            'stopDate': stopDate
                                                                             })
 
             # add sprint
@@ -837,6 +849,9 @@ def editSprint(request):
 
         sprint = Sprint.objects.get(pk=request.GET.get('id'))
 
+        startDate = sprint.start
+        stopDate = sprint.end
+
         sprint.start = sprint.start.strftime("%Y-%m-%d")
         sprint.end = sprint.end.strftime("%Y-%m-%d")
 
@@ -848,7 +863,10 @@ def editSprint(request):
                                                             'minEndDate': minEndDate,
                                                             'sprint': sprint,
                                                             'speedField': sprint.expectedSpeed,
-                                                            'success': success})
+                                                            'success': success,
+                                                            'today': today,
+                                                            'startDate': startDate,
+                                                            'stopDate': stopDate})
     else:
         return HttpResponseRedirect('/login')
 
