@@ -116,6 +116,10 @@ def project(request):
                 if field == 'status' and value != 'None':
                     StoryObject = Story.objects.get(id=int(story_id))
                     StoryObject.developmentStatus = value
+
+                    if value == "rejected":
+                        StoryObject.sprint_id = None
+
                     StoryObject.save()
 
                 if field == 'comment' and value != 'None':
