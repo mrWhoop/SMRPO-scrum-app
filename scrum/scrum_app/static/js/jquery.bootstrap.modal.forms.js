@@ -60,6 +60,7 @@ https://github.com/trco/django-bootstrap-modal-forms
     // Submit form callback function
     var submitForm = function (settings) {        
         if (!settings.asyncUpdate) {
+            console.log(settings)
             $(settings.modalForm).submit();
         } else {          
             var asyncSettingsValid = validateAsyncSettings(settings.asyncSettings);
