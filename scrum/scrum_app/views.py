@@ -21,6 +21,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from bootstrap_modal_forms.generic import BSModalUpdateView
 from .forms import TaskModelForm, StoryModelForm
 from django.template.loader import render_to_string
+from django.contrib import messages
 
 
 
@@ -55,7 +56,6 @@ def project(request):
     if request.user.is_authenticated:
 
         project_id = request.GET.get('id')
-        print(project_id)
         project = Project.objects.get(id=project_id)
         
         posts = project.getPosts().order_by('-time_posted')
@@ -595,11 +595,49 @@ class StoryUpdateView(BSModalUpdateView):
                 new_comment = request.POST["comment"]
                 
                 stories = Story.objects.filter(name__iexact=new_name)
+                name_exists = False
                 if len(stories) > 0:
                     name_exists = True
 
                 if new_name != story.name and name_exists == True:
-                    pass
+                    
+                    
+                    posts = project.getPosts().order_by('-time_posted')
+
+
+                    notProductOwner = True
+                    isScrumMaster = project.scrum_master_id == request.user.id
+                    # check product owner
+                    if project.product_owner_id == request.user.id:
+                        notProductOwner = False
+
+                    stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
+
+                    today = datetime.date.today()
+
+                    sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
+
+                    ended_sprints = Sprint.objects.filter(project=project).filter(end__lte=today)
+
+                    completed_storyes = {story for story in Story.objects.all() if Task.objects.filter(story_id=story.id).filter(done=True).count() == Task.objects.filter(story_id=story.id).count()}
+
+                   
+
+                    velocityLeft = 0
+                    if len(sprints) < 1:
+                        sprints = None
+                    else:
+                        sprints = sprints[0]
+
+                        velocityLeft = sprints.expectedSpeed
+                        sprintStories = Story.objects.filter(sprint=sprints)
+                        for story in sprintStories:
+                            velocityLeft -= story.timeCost
+
+                        name_exists = True
+                        next_href = '/project/?id='+str(project.id)
+                    return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints,
+                               'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts, 'ended_sprints': ended_sprints, "completed_storyes":completed_storyes, "name_exists":name_exists, "next_href":next_href})
                 else:
                     story.name = new_name
                     story.description = new_description
@@ -669,22 +707,22 @@ def logTime(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             # updating time done on task from stopwatch
-            # to be changes on form submision
-
-            today = datetime.date.today()
 
             taskId = request.POST['id']
             time = request.POST['time']
 
             task = Task.objects.get(pk=taskId)
+            today = datetime.date.today()
             timeSpent = TimeSpent.objects.filter(task=task, date=today)
 
             if len(timeSpent) == 0:
                 timeSpent = TimeSpent(task=task, date=today, time_spent=time)
+                timeSpent.startedWorkingOn = None
                 timeSpent.save()
             else:
                 timeSpent = timeSpent[0]
                 timeSpent.time_spent = timeSpent.time_spent + int(time)
+                timeSpent.startedWorkingOn = None
                 timeSpent.save()
 
             times = TimeSpent.objects.filter(task=task)
@@ -709,12 +747,51 @@ def logTime(request):
 
                 time.time_spent = hours + ':' + mins + ':' + secs
 
-            return render(request, "log_time.html", context={'task': task, 'times': times})
+            return render(request, "log_time.html", context={'workingOnSth': False, 'task': task, 'times': times, 'workDoneToday': 0, 'time': '00:00:00'})
         else:
+            # check if there is work being done on some other task
+            user = get_user_model().objects.get(id=request.user.id)
+            tasks_checkings = Task.objects.filter(assignedUser=user, userConfirmed='accepted')
+            for tasks_checking in tasks_checkings:
+                time_checkings = TimeSpent.objects.filter(task=tasks_checking)
+                for time_checking in time_checkings:
+                    if time_checking.startedWorkingOn and not time_checking.task_id == int(request.GET.get('id')):
+                        return render(request, "log_time.html", context={'workingOnSth': True, 'workingOnTask': tasks_checking})
+
             task = Task.objects.get(pk=request.GET.get('id'))
             times = TimeSpent.objects.filter(task=task)
 
+            timeDF = '00:00:00'
+            timeSpentWorking = 0
+            today = datetime.date.today()
+            workDoneToday = TimeSpent.objects.filter(task=task, date=today)
+            if workDoneToday:
+                startedWorkingOn = workDoneToday[0].startedWorkingOn
+                if startedWorkingOn:
+                    timeDifference = datetime.datetime.now(datetime.timezone.utc) - startedWorkingOn
+                    timeSpentWorking = timeDifference.total_seconds()
+
+                    remain = int(timeSpentWorking)
+                    hours = int(remain / 3600)
+                    remain -= hours * 3600
+                    mins = int(remain / 60)
+                    remain -= mins * 60
+                    secs = remain
+
+                    hours = str(hours)
+                    if len(hours) < 2:
+                        hours = '0' + hours
+                    mins = str(mins)
+                    if len(mins) < 2:
+                        mins = '0' + mins
+                    secs = str(secs)
+                    if len(secs) < 2:
+                        secs = '0' + secs
+
+                    timeDF = hours + ':' + mins + ':' + secs
+
             for time in times:
+
                 remain = int(time.time_spent)
                 hours = int(remain / 3600)
                 remain -= hours * 3600
@@ -734,9 +811,29 @@ def logTime(request):
 
                 time.time_spent = hours + ':' + mins + ':' + secs
 
-            return render(request, "log_time.html", context={'task': task, 'times': times})
+            return render(request, "log_time.html", context={'workingOnSth': False, 'task': task, 'times': times, 'workDoneToday': int(timeSpentWorking), 'time': timeDF})
     else:
         return HttpResponseRedirect('/login/')
+
+def startWorkingOn(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            task_id = request.POST['task_id']
+            task = Task.objects.get(pk=task_id)
+            today = datetime.date.today()
+            timeSpent = TimeSpent.objects.filter(task=task, date=today)
+
+            if len(timeSpent) == 0:
+                timeSpent = TimeSpent(task=task, date=today, time_spent=0)
+                timeSpent.startedWorkingOn = datetime.datetime.now(datetime.timezone.utc)
+                timeSpent.save()
+
+            elif timeSpent[0].startedWorkingOn is None:
+                timeSpent = timeSpent[0]
+                timeSpent.startedWorkingOn = datetime.datetime.now(datetime.timezone.utc)
+                timeSpent.save()
+
+    return HttpResponse(None)
 
 def sprints(request):
     if request.user.is_authenticated:
@@ -755,6 +852,7 @@ def editSprint(request):
         success = False
         start_overlapping = False
         startBigger = False
+        today = datetime.date.today().strftime("%Y-%m-%d")
         minEndDate = (datetime.date.today() + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
         minStartDate = datetime.date.today().strftime("%Y-%m-%d")
 
@@ -765,6 +863,8 @@ def editSprint(request):
             project_id = request.POST['projectId']
             sprint_id = request.POST['sprintId']
             changeSprint = Sprint.objects.get(pk=sprint_id)
+            startDate = changeSprint.start
+            stopDate = changeSprint.end
             start = request.POST['start']
             start = datetime.datetime.strptime(start, '%Y-%m-%d').date()
             end = request.POST['end']
@@ -791,7 +891,10 @@ def editSprint(request):
                                                                             'startBigger': startBigger,
                                                                             'sprint': changeSprint,
                                                                             'speedField': changeSprint.expectedSpeed,
-                                                                            'success': success
+                                                                            'success': success,
+                                                                            'today': today,
+                                                                            'startDate': startDate,
+                                                                            'stopDate': stopDate
                                                                             })
                     if sprintEnd >= end and sprintStart <= end:
                         end_overlapping = True
@@ -806,7 +909,10 @@ def editSprint(request):
                                                                             'sprint': changeSprint,
                                                                             'end_overlapping': end_overlapping,
                                                                             'speedField': changeSprint.expectedSpeed,
-                                                                            'success': success
+                                                                            'success': success,
+                                                                            'today': today,
+                                                                            'startDate': startDate,
+                                                                            'stopDate': stopDate
                                                                             })
                     if start > end:
                         startBigger = True
@@ -821,6 +927,9 @@ def editSprint(request):
                                                                             'sprint': changeSprint,
                                                                             'speedField': changeSprint.expectedSpeed,
                                                                             'success': success,
+                                                                            'today': today,
+                                                                            'startDate': startDate,
+                                                                            'stopDate': stopDate
                                                                             })
 
             # add sprint
@@ -837,6 +946,9 @@ def editSprint(request):
 
         sprint = Sprint.objects.get(pk=request.GET.get('id'))
 
+        startDate = sprint.start
+        stopDate = sprint.end
+
         sprint.start = sprint.start.strftime("%Y-%m-%d")
         sprint.end = sprint.end.strftime("%Y-%m-%d")
 
@@ -848,7 +960,10 @@ def editSprint(request):
                                                             'minEndDate': minEndDate,
                                                             'sprint': sprint,
                                                             'speedField': sprint.expectedSpeed,
-                                                            'success': success})
+                                                            'success': success,
+                                                            'today': today,
+                                                            'startDate': startDate,
+                                                            'stopDate': stopDate})
     else:
         return HttpResponseRedirect('/login')
 

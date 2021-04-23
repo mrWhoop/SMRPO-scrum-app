@@ -4,6 +4,9 @@
 
 {% block javascript %}
 <script>
+
+var token = '{{csrf_token}}';
+
 var sw = {
   // (A) INITIALIZE
   etime : null, // HTML time display
@@ -24,7 +27,7 @@ var sw = {
 
   // (B) TIMER ACTION
   timer : null, // timer object
-  now : 0, // current elapsed time
+  now : {{ workDoneToday }}, // current elapsed time
   tick : function () {
     // (B1) CALCULATE HOURS, MINS, SECONDS
     sw.now++;
@@ -48,6 +51,15 @@ var sw = {
     sw.ego.value = "Stop";
     sw.ego.removeEventListener("click", sw.start);
     sw.ego.addEventListener("click", sw.stop);
+
+    var task_id = {{ task.id }};
+    $.ajax({
+        type: "POST",
+        headers: { "X-CSRFToken":  token },
+        url: "/ajax/task/logtime/",
+        data : {task_id: task_id}
+    }).done(function(result) {});
+
   },
 
   // (D) STOP
@@ -70,10 +82,10 @@ window.addEventListener("load", sw.init);
 </script>
 {% endblock %}
 
-<form method="POST" action="{% url 'log_time' %}">
+<form method="POST" action="{% url 'log_time' %}" {% if workingOnSth %} hidden {% endif %}>
   	{% csrf_token %}
   <div id="stopwatch" style="display: flex; flex-wrap: wrap; max-width: 500px; margin: 0 auto;">
-    <div id="sw-time" style="width: 100%; padding: 20px 0; font-size: 100px; font-weight: bold; text-align: center; background: #000; color: #fff;">00:00:00</div>
+    <div id="sw-time" style="width: 100%; padding: 20px 0; font-size: 100px; font-weight: bold; text-align: center; background: #000; color: #fff;">{{time}}</div>
     <input type="text" name="id" value="{{ task.id }}" hidden>
     <input id="tme" type="text" name="time" hidden>
     <input style="box-sizing: border-box; width: 50%; cursor: pointer; padding: 7px 0; border: 0; color: #fff; font-size: 20px; background-color: #a32208;" type="submit" value="Done" id="sw-rst" disabled/>
@@ -81,6 +93,7 @@ window.addEventListener("load", sw.init);
   </div>
 </form>
 
+<div {% if workingOnSth %} hidden {% endif %}>
 <h5>Description: {{ task.description }}</h5>
     <div>Time cost: {{ task.timeCost }}</div>
 
@@ -88,5 +101,8 @@ window.addEventListener("load", sw.init);
     {% for time in times %}
       {{ time.date }}: {{ time.time_spent }} <br>
     {% endfor %}
+</div>
+
+<h1 {% if not workingOnSth %} hidden {% endif %}>You are already working on {{workingOnTask.description}}.</h1>
 
 {% endblock %}

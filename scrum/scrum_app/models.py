@@ -87,6 +87,7 @@ class Task(models.Model):
 
     story = models.ForeignKey(Story, on_delete=models.CASCADE)
 
+    # koliko je še do zaključka
     timeCost = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
     description = models.TextField()
@@ -108,6 +109,8 @@ class TimeSpent(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
     time_spent = models.IntegerField(null=True)
+
+    startedWorkingOn = models.DateTimeField(null=True)
 
     date = models.DateField()
 

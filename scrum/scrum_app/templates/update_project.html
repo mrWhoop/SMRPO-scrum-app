@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h4 class="title">New project</h4>
+<form id="new-project-form" method="post" 
+action="{% url 'new_project_form' %}" class="col-4">
+    {% csrf_token %}
+	<div class="mb-3">
+		<label class="form-label" for="project_name">Name:</label>
+		<input value="{{project.projectName}}" class="form-control" type="text" name="project_name" required>
+        {% if name_exists == True %}
+            <p class="text-danger">
+                Project name already exists!
+            </p>
+        {% endif %}
+	</div>
+    <div class="mb-3">
+		<label class="form-label" for="description">Description:</label>
+		<textarea class="form-control" rows="5" type="text" name="description" required>{{project.description}}</textarea>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="product_owner">Product owner:</label>
+		<select class="form-control" name="product_owner">
+        {% for user in users %}
+            <option {% if user.username == current_product_owner %} selected {% endif %} value="{{ user.username }}">{{ user.username }}</option>
+        {% endfor %}
+        </select>
+	</div>
+	<div class="mb-3">
+        <label class="form-label" for="scrum_master">Scrum master:</label>
+		<select class="form-control" name="scrum_master">
+        {% for user in users %}
+            <option {% if user.username == current_scrum_master %} selected {% endif %} value="{{ user.username }}">{{ user.username }}</option>
+        {% endfor %}
+        </select>
+	</div>
+	<div class="mb-3">
+		<label class="form-label" for="developers">Developers:</label>
+		<select class="form-select" multiple name="developers">
+        {% for dev in devs %}
+            <option selected value="{{ dev }}" selected="selected">{{ dev }}</option>
+        {% endfor %}
+        {% for user in users %}
+            <option value="{{ user.username }}" selected="selected">{{ user.username }}</option>
+        {% endfor %}
+        </select>
+        {% if dev_and_product_own == True %}
+            <p class="text-danger">
+                Product owner cannot be developer!
+            </p>
+        {% endif %}
+	</div>
+    <div class="mb-3"></div>
+    <input type="submit" value="Add project" 
+                       class="btn btn-primary pull-right float_button" />
+    {% if success == True %}
+    </br>
+    <p class="text-success">
+        Project added succesfuly!
+    </p>
+    {% endif %}
+
+</form>
+
+{% endblock %}
