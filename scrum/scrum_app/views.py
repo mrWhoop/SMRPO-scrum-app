@@ -669,22 +669,22 @@ def logTime(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             # updating time done on task from stopwatch
-            # to be changes on form submision
-
-            today = datetime.date.today()
 
             taskId = request.POST['id']
             time = request.POST['time']
 
             task = Task.objects.get(pk=taskId)
+            today = datetime.date.today()
             timeSpent = TimeSpent.objects.filter(task=task, date=today)
 
             if len(timeSpent) == 0:
                 timeSpent = TimeSpent(task=task, date=today, time_spent=time)
+                timeSpent.startedWorkingOn = None
                 timeSpent.save()
             else:
                 timeSpent = timeSpent[0]
                 timeSpent.time_spent = timeSpent.time_spent + int(time)
+                timeSpent.startedWorkingOn = None
                 timeSpent.save()
 
             times = TimeSpent.objects.filter(task=task)
@@ -709,12 +709,51 @@ def logTime(request):
 
                 time.time_spent = hours + ':' + mins + ':' + secs
 
-            return render(request, "log_time.html", context={'task': task, 'times': times})
+            return render(request, "log_time.html", context={'workingOnSth': False, 'task': task, 'times': times, 'workDoneToday': 0, 'time': '00:00:00'})
         else:
+            # check if there is work being done on some other task
+            user = get_user_model().objects.get(id=request.user.id)
+            tasks_checkings = Task.objects.filter(assignedUser=user, userConfirmed='accepted')
+            for tasks_checking in tasks_checkings:
+                time_checkings = TimeSpent.objects.filter(task=tasks_checking)
+                for time_checking in time_checkings:
+                    if time_checking.startedWorkingOn and not time_checking.task_id == int(request.GET.get('id')):
+                        return render(request, "log_time.html", context={'workingOnSth': True, 'workingOnTask': tasks_checking})
+
             task = Task.objects.get(pk=request.GET.get('id'))
             times = TimeSpent.objects.filter(task=task)
 
+            timeDF = '00:00:00'
+            timeSpentWorking = 0
+            today = datetime.date.today()
+            workDoneToday = TimeSpent.objects.filter(task=task, date=today)
+            if workDoneToday:
+                startedWorkingOn = workDoneToday[0].startedWorkingOn
+                if startedWorkingOn:
+                    timeDifference = datetime.datetime.now(datetime.timezone.utc) - startedWorkingOn
+                    timeSpentWorking = timeDifference.total_seconds()
+
+                    remain = int(timeSpentWorking)
+                    hours = int(remain / 3600)
+                    remain -= hours * 3600
+                    mins = int(remain / 60)
+                    remain -= mins * 60
+                    secs = remain
+
+                    hours = str(hours)
+                    if len(hours) < 2:
+                        hours = '0' + hours
+                    mins = str(mins)
+                    if len(mins) < 2:
+                        mins = '0' + mins
+                    secs = str(secs)
+                    if len(secs) < 2:
+                        secs = '0' + secs
+
+                    timeDF = hours + ':' + mins + ':' + secs
+
             for time in times:
+
                 remain = int(time.time_spent)
                 hours = int(remain / 3600)
                 remain -= hours * 3600
@@ -734,9 +773,29 @@ def logTime(request):
 
                 time.time_spent = hours + ':' + mins + ':' + secs
 
-            return render(request, "log_time.html", context={'task': task, 'times': times})
+            return render(request, "log_time.html", context={'workingOnSth': False, 'task': task, 'times': times, 'workDoneToday': int(timeSpentWorking), 'time': timeDF})
     else:
         return HttpResponseRedirect('/login/')
+
+def startWorkingOn(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            task_id = request.POST['task_id']
+            task = Task.objects.get(pk=task_id)
+            today = datetime.date.today()
+            timeSpent = TimeSpent.objects.filter(task=task, date=today)
+
+            if len(timeSpent) == 0:
+                timeSpent = TimeSpent(task=task, date=today, time_spent=0)
+                timeSpent.startedWorkingOn = datetime.datetime.now(datetime.timezone.utc)
+                timeSpent.save()
+
+            elif timeSpent[0].startedWorkingOn is None:
+                timeSpent = timeSpent[0]
+                timeSpent.startedWorkingOn = datetime.datetime.now(datetime.timezone.utc)
+                timeSpent.save()
+
+    return HttpResponse(None)
 
 def sprints(request):
     if request.user.is_authenticated:
