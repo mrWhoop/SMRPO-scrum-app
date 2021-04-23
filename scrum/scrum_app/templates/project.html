@@ -166,7 +166,7 @@
                     {{story.timeSpent}} h</div>
 
                     <div>
-                        {% if not notProductOwner and story in completed_storyes %}
+                        {% if not notProductOwner %}
 
                             <div class="mb-2">
                                 <label for="status_{{ story.id }}">Development status:</label>
@@ -174,7 +174,10 @@
                                     <!--option {% if story.developmentStatus == "new" %} selected {% endif %} value="new">New</option-->
                                     <!--option {% if story.developmentStatus == "in_progress" %} selected {% endif %} value="in_progress">In progress</option-->
                                     <!--option {% if story.developmentStatus == "incomplete" %} selected {% endif %} value="incomplete">Incomplete</option-->
+                                    <option value=""></option>
+                                    {% if story in completed_storyes %}
                                     <option {% if story.developmentStatus == "accepted" %} selected {% endif %} value="accepted">Accepted</option>
+                                    {% endif %}
                                     <option {% if story.developmentStatus == "rejected" %} selected {% endif %} value="rejected">Rejected</option>
                                 </select>
                             </div>
