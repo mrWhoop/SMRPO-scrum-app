@@ -57,11 +57,11 @@
                                 <textarea class='form-control' rows='3' type='textfield' name='comment_${story_id}' required>{{story.comment}}</textarea>`;
 
 
-            if(this.value=="rejected" ){
+            if(this.value=="rejected"){
                 $(this).parent().parent().parent().find(".comment").append(comment_html);
                 //$(this).parent().parent().parent().find(".comment").removeClass("d-none");
             }
-            if(this.value=="accepted" ){
+            if(this.value=="" || this.value=="accepted"){
                 $(this).parent().parent().parent().find(".comment").empty();
                 //$(this).parent().parent().parent().find(".comment").addClass("d-none");
             }
@@ -216,7 +216,7 @@
                     </div>
 
                      <div class="mb-3 comment">
-                        {% if not notProductOwner and story in completed_storyes and story.developmentStatus == 'rejected' %}
+                        {% if not notProductOwner and story.developmentStatus == 'rejected' %}
                             <label class="form-label" for="comment_{{ story.id }}">Comment:</label>
                             <textarea class="form-control" rows="3" type="textfield" name="comment_{{ story.id }}" required>{{story.comment}}</textarea>
                         {% endif %}
