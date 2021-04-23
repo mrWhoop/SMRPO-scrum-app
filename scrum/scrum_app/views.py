@@ -21,6 +21,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from bootstrap_modal_forms.generic import BSModalUpdateView
 from .forms import TaskModelForm, StoryModelForm
 from django.template.loader import render_to_string
+from django.contrib import messages
 
 
 
@@ -55,7 +56,6 @@ def project(request):
     if request.user.is_authenticated:
 
         project_id = request.GET.get('id')
-        print(project_id)
         project = Project.objects.get(id=project_id)
         
         posts = project.getPosts().order_by('-time_posted')
@@ -595,11 +595,49 @@ class StoryUpdateView(BSModalUpdateView):
                 new_comment = request.POST["comment"]
                 
                 stories = Story.objects.filter(name__iexact=new_name)
+                name_exists = False
                 if len(stories) > 0:
                     name_exists = True
 
                 if new_name != story.name and name_exists == True:
-                    pass
+                    
+                    
+                    posts = project.getPosts().order_by('-time_posted')
+
+
+                    notProductOwner = True
+                    isScrumMaster = project.scrum_master_id == request.user.id
+                    # check product owner
+                    if project.product_owner_id == request.user.id:
+                        notProductOwner = False
+
+                    stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
+
+                    today = datetime.date.today()
+
+                    sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
+
+                    ended_sprints = Sprint.objects.filter(project=project).filter(end__lte=today)
+
+                    completed_storyes = {story for story in Story.objects.all() if Task.objects.filter(story_id=story.id).filter(done=True).count() == Task.objects.filter(story_id=story.id).count()}
+
+                   
+
+                    velocityLeft = 0
+                    if len(sprints) < 1:
+                        sprints = None
+                    else:
+                        sprints = sprints[0]
+
+                        velocityLeft = sprints.expectedSpeed
+                        sprintStories = Story.objects.filter(sprint=sprints)
+                        for story in sprintStories:
+                            velocityLeft -= story.timeCost
+
+                        name_exists = True
+                        next_href = '/project/?id='+str(project.id)
+                    return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints,
+                               'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts, 'ended_sprints': ended_sprints, "completed_storyes":completed_storyes, "name_exists":name_exists, "next_href":next_href})
                 else:
                     story.name = new_name
                     story.description = new_description

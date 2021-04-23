@@ -100,10 +100,17 @@
                     dataKey: "context",
                     addModalFormFunction: updateStoryModalForm
                     }*/
-                })
+                });
+                
             });
         }
         updateStoryModalForm()
+        
+        if("{{name_exists}}"){
+            alertify.alert("Name already exists!", function(){
+                window.location.href = "{{next_href}}";
+            });
+        }
 
     });
 
