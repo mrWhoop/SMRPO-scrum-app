@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 class LastLogin(models.Model):
     lastLoginTime = models.DateTimeField(null=True)
@@ -102,7 +103,13 @@ class Task(models.Model):
     def getTimeSpent(self):
         return TimeSpent.objects.filter(task_id=self)
 
+    def getTimeSpentSum(self):
+        seconds = sum([time_spent.time_spent for time_spent in TimeSpent.objects.filter(task_id=self)])
+        return datetime.timedelta(seconds=seconds)
+
     timeSpent = property(getTimeSpent)
+
+    timeSpentSum = property(getTimeSpentSum)
 
 class TimeSpent(models.Model):
 

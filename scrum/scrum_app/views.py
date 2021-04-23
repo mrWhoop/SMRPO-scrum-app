@@ -167,9 +167,7 @@ def new_story_form(request):
 
     if request.user.is_authenticated:
         user = user = get_user_model().objects.get(id=request.user.id)
-        #projects = Project.objects.filter(product_owner=user)
         projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
-        # sprints = Sprint.objects.all()
         success = False
         name_exists = False
 
@@ -178,17 +176,8 @@ def new_story_form(request):
             story_description = request.POST["story_description"]
             story_priority = request.POST["story_priority"]
             story_bussines_value = request.POST["story_bussines_value"]
-            # time_cost = request.POST["time_cost"]
-            # time_spent = request.POST["time_spent"]
-            # asignee = request.POST["asignee"]
-            # user_confirmed = request.POST.get('user_confirmed', "") == "on"
             comment = request.POST['comment']
-            # story_status = request.POST['story_status']
             project = request.POST['project']
-            # sprint = request.POST['sprint'] if request.POST['sprint'] else None
-
-            # if time_cost == '':
-            #     time_cost = None
 
             try:
                 Story.objects.get(name=story_name, project_id=int(project))
@@ -198,14 +187,9 @@ def new_story_form(request):
                             description=story_description,
                             priority=story_priority,
                             businessValue=story_bussines_value,
-                            #timeCost=time_cost,
-                            # timeSpent=time_spent,
-                            # assignedUser_id=asignee,
-                            # userConfirmed=user_confirmed,
                             comment=comment,
                             developmentStatus='new',
-                            project_id=project,
-                            # sprint_id=sprint
+                            project_id=project
                             )
                 story.save()
                 success = not success
@@ -387,40 +371,13 @@ def my_tasks(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
 
-        
-        #for project in projects:
-        #    stories = Story.objects.filter(Q(project_id=project))
-        #    for story in stories:
-        #        tasks = Task.objects.filter(Q(story_id=story))
-        #        for task in tasks:
-        #            continue
-
-        #data_projects = { project : { story : Task.objects.filter(Q(story_id=story)) for story in Story.objects.filter(Q(project_id=project)) } for project in projects}
-
-        #dobil bi rad storyje ločene na projekt
-        #stories = Story.objects.filter(Q(project_id=project))
-
-        #dobil bi rad taske ločene na story
-        #tasks = Task.objects.filter(Q(story_id=story))
-
-        #print("OUT: ", list(request.POST.items()), file=sys.stderr)
-
-        #dev = DevTeamMember.objects.filter(userId_id=user)
-
-        #projects =
-
-        #projects_dev = DevTeamMember.objects.projects
-
-        #dodat da si developer
-
-        #projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
-        #projects = Project.objects.filter(Q(id=dev))
-        #projects = Project.objects.filter(id=dev)
-
+        today = datetime.date.today()
+        current_sprint = Sprint.objects.filter(Q(start__lte=today)&Q(end__gte=today)).first()
         projects = {Project.objects.get(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
 
         return render(request, 'my_tasks.html', context={'projects': projects,
-                                                         'activate_mytasks': 'active'})
+                                                         'activate_mytasks': 'active',
+                                                         'current_sprint': current_sprint})
     else:
         return HttpResponseRedirect('/login')
 
@@ -446,9 +403,13 @@ def update_task_done(request):
         if request.method == 'POST':
             task_id = request.POST['task_id']
             done = request.POST['done']
-            print(done)
             task = Task.objects.get(id=int(task_id))
             task.done = done == "true"
+            if done == "true":
+                task.timeCost = 0.0
+            #else:
+            #    times_spent = TimeSpent.objects.filter(task_id=int(task.id))
+            #    task.timeCost = sum([time_spent.time_spent for time_spent in times_spent])
             task.save()
 
     return HttpResponse(task_id)
@@ -612,16 +573,10 @@ class StoryUpdateView(BSModalUpdateView):
                         notProductOwner = False
 
                     stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
-
                     today = datetime.date.today()
-
                     sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
-
                     ended_sprints = Sprint.objects.filter(project=project).filter(end__lte=today)
-
                     completed_storyes = {story for story in Story.objects.all() if Task.objects.filter(story_id=story.id).filter(done=True).count() == Task.objects.filter(story_id=story.id).count()}
-
-                   
 
                     velocityLeft = 0
                     if len(sprints) < 1:

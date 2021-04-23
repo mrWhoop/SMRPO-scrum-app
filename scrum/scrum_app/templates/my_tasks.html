@@ -14,7 +14,7 @@
 
 	    		{% if story.tasks %}
 
-		    		<div class="card float-start col-2">
+		    		<div class="card float-start col-3">
 		    			<div class="card-header">
 		    				Story: {{ story.name }}
 		    			</div>
@@ -30,6 +30,9 @@
 						    				</div>
 											<div class="mb-2">
 						    					Time cost: {{ task.timeCost }}<br>
+						    				</div>
+						    				<div class="mb-2">
+						    					Time spent: {{ task.timeSpentSum }}<br>
 						    				</div>
 						    				<div class="row">
 						    					<div class="btns_{{task.id}} col {% if task.done %} d-none {% endif %}">
@@ -47,7 +50,7 @@
 								    				</div>
 							    				</div>
 						    					<div class="mt-2">
-									                <div class="done_{{task.id}} form-check form-switch mt-2 {% if task.userConfirmed != 'accepted' and task.assignedUser_id != user.id %} d-none {% endif %}">
+									                <div class="done_{{task.id}} form-check form-switch mt-2 {% if task.userConfirmed != 'accepted' and task.assignedUser_id != user.id or story.sprint_id != current_sprint.id %} d-none {% endif %}">
 									                  <input class="form-check-input checkbox_click" data-value="{{ task.id }}" type="checkbox" id="flexSwitchCheckDefault" name="done" {% if task.done %}checked{% endif %}>
 									                  <label class="form-check-label" for="flexSwitchCheckDefault">Done</label>
 									                </div>
