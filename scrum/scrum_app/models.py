@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from ckeditor.fields import RichTextField
 import datetime
 
 class LastLogin(models.Model):
@@ -17,6 +18,8 @@ class Project(models.Model):
     scrum_master = models.ForeignKey(User, on_delete=models.CASCADE, related_name='scrum_master')
 
     description = models.TextField()
+
+    documentation = RichTextField(blank=True, null=True)
 
     def getStories(self):
         return Story.objects.filter(project_id=self)

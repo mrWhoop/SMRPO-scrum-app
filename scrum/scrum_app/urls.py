@@ -35,5 +35,7 @@ urlpatterns = [
     url(r'^change_password/$', views.change_password, name='change_password'),
     url(r'^project/story/(?P<story_id>.*)/delete/(?P<task_id>.*)$', views.delete_task, name='delete_task'),
     url(r'^project/story/update_task/(?P<pk>\d+)/$', views.TaskUpdateView.as_view(), name='update_task'),
-
+    url(r'^project/documentation/$', views.documentation, name='documentation'),
+    url(r'^dl/doc$', views.download, name='download'),
+    url(r'^ul/doc$', views.upload, name='upload'),
 ]

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div style="float:left;">
+<form method="POST">
+    {% csrf_token %}
+    <input name="id" value="{{ project.id }}" hidden>
+    {{ form.media }}
+    {{ form.as_p }}
+    <button style="margin-bottom:20px">Submit</button>
+</form>
+</div>
+
+<div>
+<div style="float:right; max-width:840px; border-style: solid; border-color:#4F8EC3; padding:5px">{{ project.documentation | safe }}</div>
+<a href="/dl/doc?id={{ project.id }}" style="color:blue; margin-left:25px">Export</a><br>
+<a href="/ul/doc?id={{ project.id }}" style="color:blue; margin-left:25px">Import</a><br>
+</div>
+{% endblock %}

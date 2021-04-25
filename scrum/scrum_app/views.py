@@ -3,7 +3,7 @@ import datetime, pytz
 import json
 from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
@@ -19,9 +19,10 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from bootstrap_modal_forms.generic import BSModalUpdateView
-from .forms import TaskModelForm, StoryModelForm
+from .forms import TaskModelForm, StoryModelForm, DocumentationForm
 from django.template.loader import render_to_string
 from django.contrib import messages
+from django.core.files import File
 
 
 
@@ -40,14 +41,14 @@ def index(request):
         projects_devs = []
         for project_dev in projects_devs_qs:
             projects_devs.append(project_dev[0])
-        projects_qs = {Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user) )}
+        projects_qs = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user) )
         projects =[]
         for project in projects_qs:
-            if len(project) > 0:
-                projects.append(project[0])
+            if project:
+                projects.append(project)
         projects = list(set(projects_devs) | set(projects))
         return render(request, 'home.html', context={'projects': projects,
-                                                    'activate_home':'active',
+                                                     'activate_home':'active',
                                                      'lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login')
@@ -932,5 +933,64 @@ def deleteSprint(request):
         redirectUrl = "/sprints?id=" + str(project_id)
 
         return redirect(redirectUrl)
+    else:
+        return HttpResponseRedirect('/login')
+
+def documentation(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+
+            form = DocumentationForm(request.POST)
+
+            if form.is_valid():
+                projectId = request.POST['id']
+                documentation = form.cleaned_data['documentation']
+                project = Project.objects.get(pk=projectId)
+                project.documentation = documentation
+                project.save()
+
+                form = DocumentationForm(initial={'documentation': project.documentation})
+                return render(request, 'documentation.html', context={'form': form, 'project': project})
+
+        else:
+            project = Project.objects.get(pk=request.GET.get('id'))
+            form = DocumentationForm(initial={'documentation': project.documentation})
+            return render(request, 'documentation.html', context={'form': form, 'project': project})
+    else:
+        return HttpResponseRedirect('/login')
+
+def download(request):
+    if request.user.is_authenticated:
+        projectId = request.GET.get('id')
+        project = Project.objects.get(pk=projectId)
+
+        filename = project.projectName
+
+        with open(filename, 'w', encoding='utf-8') as f:
+            myfile = File(f)
+            myfile.write(project.documentation)
+
+        return FileResponse(open(filename, 'rb'))
+    else:
+        return HttpResponseRedirect('/login')
+
+def upload(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            projectId = request.POST['id']
+            uploaded_file = request.FILES['document']
+
+            uploaded_file = uploaded_file.read()
+            uploaded_file = uploaded_file.replace(b'\r\r\n', b'')
+
+            project = Project.objects.get(pk=projectId)
+            project.documentation = uploaded_file.decode('utf8')
+            project.save()
+
+            redirectUrl = "/project/documentation/?id=" + str(projectId)
+            return redirect(redirectUrl)
+
+        projectId = request.GET.get('id')
+        return render(request, 'upload.html', context={'id': projectId})
     else:
         return HttpResponseRedirect('/login')
