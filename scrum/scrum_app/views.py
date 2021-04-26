@@ -206,6 +206,53 @@ def new_story_form(request):
     else:
         return HttpResponseRedirect('/login')
 
+def update_project(request, project_id):
+    if request.user.is_authenticated:
+        project = Project.objects.get(id=project_id)
+        users =  get_user_model().objects.all()
+        dev_team_members = project.getDevTeamMembers()
+        dev_team_members_users = {get_user_model().objects.get(username=devTeamMember.userId) for devTeamMember in dev_team_members}
+        other_users = get_user_model().objects.exclude(username__in=dev_team_members_users)
+        success = False
+        name_exists = False
+        dev_and_product_own = False
+        if request.method == 'POST':
+            project_name =request.POST["project_name"]
+            product_owner = request.POST["product_owner"]
+            product_owner = User.objects.get(username=product_owner)
+            scrum_master = request.POST["scrum_master"]
+            scrum_master = User.objects.get(username=scrum_master)
+            description = request.POST["description"]
+            projects = Project.objects.filter(projectName__iexact=project_name)
+            if len(projects) > 0 and project_name != project.projectName:
+                name_exists = True
+                
+            if name_exists == False:
+                project.projectName = project_name
+                project.product_owner = product_owner
+                project.scrum_master = scrum_master
+                project.description = description
+                if request.POST["product_owner"] not in request.POST.getlist("developers"):
+                    project.save()
+                    for dev_team_member in request.POST.getlist("developers"):
+                        user = User.objects.get(username=dev_team_member)
+                        dev = DevTeamMember.objects.filter(Q(userId=user)&Q(projectId=project)).first()
+                        if dev == None:
+                            new_dev = DevTeamMember(userId=user, projectId=project)
+                            new_dev.save()   
+                        else:
+                            dev.save()   
+                        success = True
+                else:
+                    dev_and_product_own = True 
+                if success == True:
+                    return HttpResponseRedirect('/')
+        
+        return render(request, 'update_project.html',context={'project':project, 'devs':project.getDevTeamMembers(), 'users':users, 'current_product_owner':project.product_owner.username, 'current_scrum_master':project.scrum_master.username, 'other_users':other_users, 'dev_and_product_own':dev_and_product_own, 'success': success,
+                                'name_exists':name_exists})
+    else:
+        return HttpResponseRedirect('/login') 
+
 def new_project_form(request):
     if request.user.is_authenticated:
         users =  get_user_model().objects.all()

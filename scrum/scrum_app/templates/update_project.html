@@ -2,9 +2,9 @@
 {% load static %}
 {% block content %}
 
-<h4 class="title">New project</h4>
-<form id="new-project-form" method="post" 
-action="{% url 'new_project_form' %}" class="col-4">
+<h4 class="title">Edit project</h4>
+<form id="update-project" method="post" 
+action="{% url 'update_project' project.id %}" class="col-4">
     {% csrf_token %}
 	<div class="mb-3">
 		<label class="form-label" for="project_name">Name:</label>
@@ -39,10 +39,10 @@ action="{% url 'new_project_form' %}" class="col-4">
 		<label class="form-label" for="developers">Developers:</label>
 		<select class="form-select" multiple name="developers">
         {% for dev in devs %}
-            <option selected value="{{ dev }}" selected="selected">{{ dev }}</option>
+            <option selected value="{{ dev.userId.username }}" selected="selected">{{ dev.userId.username }}</option>
         {% endfor %}
-        {% for user in users %}
-            <option value="{{ user.username }}" selected="selected">{{ user.username }}</option>
+        {% for user in other_users %}
+           <option value="{{ user.username }}" >{{ user.username }}</option> 
         {% endfor %}
         </select>
         {% if dev_and_product_own == True %}
@@ -52,12 +52,12 @@ action="{% url 'new_project_form' %}" class="col-4">
         {% endif %}
 	</div>
     <div class="mb-3"></div>
-    <input type="submit" value="Add project" 
+    <input type="submit" value="Save project" 
                        class="btn btn-primary pull-right float_button" />
     {% if success == True %}
     </br>
     <p class="text-success">
-        Project added succesfuly!
+        Project saved succesfuly!
     </p>
     {% endif %}
 

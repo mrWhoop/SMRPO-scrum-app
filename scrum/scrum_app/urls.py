@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^new_sprint/$', views.new_sprint_form, name='new_sprint_form'),
     url(r'^project/$', views.project, name='project'),
     url(r'^project/story/$', views.story, name='story'),
+    url(r'^project/update_project/(?P<project_id>.*)$', views.update_project, name='update_project'),
     url(r'^project/delete_story/(?P<story_id>.*)$', views.delete_story, name='delete_story'),
     url(r'^project/update_story/(?P<pk>\d+)/$', views.StoryUpdateView.as_view(), name='update_story'),
     url(r'^project/story/new_task/$', views.new_task_form, name='new_task_form'),
