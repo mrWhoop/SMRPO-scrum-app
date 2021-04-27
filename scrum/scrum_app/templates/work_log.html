@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load index %}
+{% block content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+         function updateTimeSpentModalForm(){
+            $(".fa-edit").each(function(){
+                var timespentId = this.id;
+                $(this).modalForm({
+                    formURL : `/update_time_spent/${timespentId}/`,
+                    /*asyncUpdate: false,
+                    asyncSettings:{
+                    closeOnSubmit:true,
+                    successMessage: [],
+                    dataUrl: `/project/?id=1`,
+                    dataElementId: `#card_${storyId}`,
+                    dataKey: "context",
+                    addModalFormFunction: updateTimeSpentModalForm
+                    }*/
+                });
+                
+            });
+        }
+        updateTimeSpentModalForm()
+    })
+</script>
+{% endblock %}
+
+<h4 class="title">Work log</h4>
+
+<div>
+    <div class="col-4">
+        {% for task in tasks %}
+            <h5 >Task: {{task.description}}</h5>
+            <p>Time remaining: {{task.timeCost}}</p>
+            <table id="tasks-table" class="table table-hover">
+                <thead>
+                    <tr class="d-flex">
+                        <th scope="col" class="col-4 align-self-baseline"><br>Date worked</th>
+                        <th scope="col" class="col-4 align-self-baseline"><br>Time spent (h)</th>
+                        <th scope="col" class="col-2 align-self-baseline"><br>Done</th>
+                        <th scope="col" class="col-2 align-self-baseline"><br><br></th>
+                    </tr>
+                </thead>
+                
+                {% for timespent in task.timeSpent %}
+                    
+                    <tbody>
+                        <tr class="d-flex" id="row_{{task.id}}">
+                            <td class="col-4">{{timespent.date}}</td>
+                            <td class="col-4">{{timespent.time_spent|format_time}}</td>
+                            <td class="col-2">
+                                {% if task.done %}
+                                <i class="fas fa-check text-success"></i>
+                                {% else %}
+                                <i class="fas fa-times text-danger"></i>
+                                {% endif %}
+                            </td>
+                            {% if task.done == False  %}
+                            <td class="col-2" style="padding-right: 20px;">
+                                <i title="Manage work time" class="fas fa-edit cog" id="{{timespent.id}}" style="margin-top: 4px;"></i>
+                            </td>
+                            {% else %}
+                            <td class="col-2" style="padding-right: 20px;">
+                            </td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                
+                {% endfor %}
+            </table>
+            </br>
+        {% endfor %}
+        
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}

@@ -1,4 +1,4 @@
-from .models import Task, Story, Project
+from .models import Task, Story, Project, TimeSpent
 from bootstrap_modal_forms.forms import BSModalModelForm
 from django import forms
 from django.contrib.auth.models import User
@@ -10,6 +10,13 @@ class TaskModelForm(BSModalModelForm):
         model = Task
         fields = ['timeCost' , 'description', 'assignedUser']
 
+
+
+class TimeSpentModelForm(BSModalModelForm):
+
+    class Meta:
+        model = TimeSpent
+        fields = ['time_spent']
 
 class StoryModelForm(BSModalModelForm):
 
