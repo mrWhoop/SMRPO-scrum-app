@@ -1,4 +1,5 @@
-import datetime, pytz
+import datetime, pytz, time
+
 
 import json
 from django.db.models.functions import Lower
@@ -19,7 +20,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from bootstrap_modal_forms.generic import BSModalUpdateView
-from .forms import TaskModelForm, StoryModelForm, DocumentationForm
+from .forms import TaskModelForm, StoryModelForm, DocumentationForm, TimeSpentModelForm
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.core.files import File
@@ -615,6 +616,8 @@ def delete_story(request, story_id):
     else:
       return HttpResponseRedirect('/login/')  
 
+
+
 class StoryUpdateView(BSModalUpdateView):
     model = Story
     template_name = 'update_story.html'
@@ -695,6 +698,36 @@ class StoryUpdateView(BSModalUpdateView):
         else:
             return HttpResponseRedirect('/login/')
 
+
+class TimeSpentUpdateView(BSModalUpdateView):
+    model = TimeSpent
+    template_name = 'update_time_spent.html'
+    form_class = TimeSpentModelForm
+    success_message = 'Success: Task was updated.'
+    success_url = reverse_lazy('index')
+
+    def get(self, request,pk):
+        if request.user.is_authenticated:
+            time_spent = TimeSpent.objects.get(pk=pk)
+            task = time_spent.task
+            return render(request, 'update_time_spent.html', context={'task':task,'time_spent':round(time_spent.time_spent/3600,2)})
+        else: 
+            return HttpResponseRedirect('/login/')
+
+    def post(self,request,pk):
+        if request.user.is_authenticated:
+            time_spent = TimeSpent.objects.get(pk=pk)
+            task = time_spent.task
+            if task.done == False:
+                new_time_spent = request.POST["time_spent"]
+                new_time_cost = request.POST["time_cost"]
+                task.timeCost = new_time_cost
+                task.save()
+                time_spent.time_spent = int(float(new_time_spent)*3600)
+                time_spent.save()
+                return HttpResponseRedirect('/work_log/')
+        else:
+           return HttpResponseRedirect('/login/') 
 
 class TaskUpdateView(BSModalUpdateView):
     model = Task
