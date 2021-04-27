@@ -57,7 +57,7 @@
 						    					<div class="mt-2">
 						    						{% if story.sprint_id == current_sprint.id %}
 									                <div class="done_{{task.id}} form-check form-switch mt-2 {% if task.userConfirmed != 'accepted' and task.assignedUser_id != user.id %} d-none {% endif %}">
-									                  <input class="form-check-input checkbox_click" data-value="{{ task.id }}" type="checkbox" id="flexSwitchCheckDefault" name="done" {% if task.done %}checked{% endif %}>
+									                  <input title="Mark as done" class="form-check-input checkbox_click" data-value="{{ task.id }}" type="checkbox" id="flexSwitchCheckDefault" name="done" {% if task.done %}checked{% endif %}>
 									                  <label class="form-check-label" for="flexSwitchCheckDefault">Done</label>
 									                </div>
 									                {% endif %}

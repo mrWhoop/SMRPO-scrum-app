@@ -185,10 +185,10 @@ $(document).ready(function() {
           </td>
           {% if user_is_product_owner == False and task.userConfirmed != 'accepted' and time == 0  %}
           <td class="col-1">
-              <i class="fas fa-trash-alt cog select" id="{{task.id}}" style="margin-top: 4px;"></i>
+              <i title="Delete task" class="fas fa-trash-alt cog select" id="{{task.id}}" style="margin-top: 4px;"></i>
           </td>
           <td class="col-2" style="padding-right: 20px;">
-              <i class="fas fa-edit cog" id="{{task.id}}_{{story.id}}" style="margin-top: 4px;"></i>
+              <i title="Edit task" class="fas fa-edit cog" id="{{task.id}}_{{story.id}}" style="margin-top: 4px;"></i>
           </td>
           {% elif user_is_product_owner == False %}
           <td scope="col" class="col-1"></td>

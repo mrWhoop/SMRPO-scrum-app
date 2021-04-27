@@ -123,7 +123,7 @@
 <h6>Product owner: {{project.product_owner}}</h6>
 <h6>Scrum Master: {{project.scrum_master}}</h6><br>
 {% if isScrumMaster %}
-    <h6><a href="/sprints?id={{project.id}}" style="color:blue">Sprints</a></h6><br>
+    <h6><a class="btn btn-primary" title="Sprints list" href="/sprints?id={{project.id}}">Sprints</a></h6><br>
 {% endif %}
 <div class="container-fluid">
     <div class="row">
@@ -204,7 +204,7 @@
                             <div class="mb-3">
                                 <div>
                                     <label class="form-label" for="time_cost">Estimated time (story points):</label>
-                                    <input value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
+                                    <input title="Edit estimated time" value="{{story.timeCost}}" class="form-control" pattern="\d{1,5}\.\d{1,2}" type="text" name="timecost_{{ story.id }}">
                                 </div>
                             </div>
                         {% else %}
@@ -237,7 +237,7 @@
             
                     {% endif %}
             
-                    <a href="story?id={{ story.id }}" style="color:#4F8EC3">Tasks</a>
+                    <a title="List and edit tasks" class="btn btn-primary" href="story?id={{ story.id }}" >Tasks</a>
                 </div>
                 
                 
@@ -277,7 +277,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="description"></label>
-                        <textarea class="form-control" rows="4" type="text" name="description" required></textarea>
+                        <textarea title="Enter new post text" class="form-control" rows="4" type="text" name="description" required></textarea>
                     </div>
                     <div class="mb-3"></div>
                     <input id="add-post-btn" type="submit" value="Add post" 

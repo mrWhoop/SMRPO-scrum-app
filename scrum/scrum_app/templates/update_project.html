@@ -8,7 +8,7 @@ action="{% url 'update_project' project.id %}" class="col-4">
     {% csrf_token %}
 	<div class="mb-3">
 		<label class="form-label" for="project_name">Name:</label>
-		<input value="{{project.projectName}}" class="form-control" type="text" name="project_name" required>
+		<input title="Edit project name" value="{{project.projectName}}" class="form-control" type="text" name="project_name" required>
         {% if name_exists == True %}
             <p class="text-danger">
                 Project name already exists!
@@ -17,11 +17,11 @@ action="{% url 'update_project' project.id %}" class="col-4">
 	</div>
     <div class="mb-3">
 		<label class="form-label" for="description">Description:</label>
-		<textarea class="form-control" rows="5" type="text" name="description" required>{{project.description}}</textarea>
+		<textarea title="Edit project description" class="form-control" rows="5" type="text" name="description" required>{{project.description}}</textarea>
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="product_owner">Product owner:</label>
-		<select class="form-control" name="product_owner">
+		<select title="Select product owner" class="form-control" name="product_owner">
         {% for user in users %}
             <option {% if user.username == current_product_owner %} selected {% endif %} value="{{ user.username }}">{{ user.username }}</option>
         {% endfor %}
@@ -29,7 +29,7 @@ action="{% url 'update_project' project.id %}" class="col-4">
 	</div>
 	<div class="mb-3">
         <label class="form-label" for="scrum_master">Scrum master:</label>
-		<select class="form-control" name="scrum_master">
+		<select title="Select scrum master" class="form-control" name="scrum_master">
         {% for user in users %}
             <option {% if user.username == current_scrum_master %} selected {% endif %} value="{{ user.username }}">{{ user.username }}</option>
         {% endfor %}
@@ -37,7 +37,7 @@ action="{% url 'update_project' project.id %}" class="col-4">
 	</div>
 	<div class="mb-3">
 		<label class="form-label" for="developers">Developers:</label>
-		<select class="form-select" multiple name="developers">
+		<select title="Select developers" class="form-select" multiple name="developers">
         {% for dev in devs %}
             <option selected value="{{ dev.userId.username }}" selected="selected">{{ dev.userId.username }}</option>
         {% endfor %}
