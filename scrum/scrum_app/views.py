@@ -28,25 +28,32 @@ from django.core.files import File
 
 import sys
 
+def get_last_login(user):
+    last_login_time = user.last_login
+    try:
+        lastLogin = LastLogin.objects.get(user_id=request.user.id)
+        last_login_time = lastLogin.lastLoginTime
+    except:
+        pass
+    return last_login_time
+
 def index(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
-        last_login_time = user.last_login
-        try:
-            lastLogin = LastLogin.objects.get(user_id=request.user.id)
-            last_login_time = lastLogin.lastLoginTime
-        except:
-            pass
-        projects_devs_qs = {Project.objects.filter(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
-        projects_devs = []
-        for project_dev in projects_devs_qs:
-            projects_devs.append(project_dev[0])
-        projects_qs = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user) )
-        projects =[]
-        for project in projects_qs:
-            if project:
-                projects.append(project)
-        projects = list(set(projects_devs) | set(projects))
+        last_login_time = get_last_login(user)
+        if user.is_staff:
+            projects = Project.objects.all()
+        else:
+            projects_devs_qs = {Project.objects.filter(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
+            projects_devs = []
+            for project_dev in projects_devs_qs:
+                projects_devs.append(project_dev[0])
+            projects_qs = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user) )
+            projects =[]
+            for project in projects_qs:
+                if project:
+                    projects.append(project)
+            projects = list(set(projects_devs) | set(projects))
         return render(request, 'home.html', context={'projects': projects,
                                                      'activate_home':'active',
                                                      'lastLogin': last_login_time})
@@ -55,6 +62,8 @@ def index(request):
 
 def project(request):
     if request.user.is_authenticated:
+        usr = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(usr)
 
         project_id = request.GET.get('id')
         project = Project.objects.get(id=project_id)
@@ -113,7 +122,8 @@ def project(request):
                     if velocityCheck < 0:
                         return render(request, 'project.html',
                                       context={'project': project, 'stories': stories, 'sprints': sprints,
-                                               'activate_home': 'active', 'velocityLeft': velocityLeft, 'velocityExceeded': True, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster})
+                                               'activate_home': 'active', 'velocityLeft': velocityLeft, 'velocityExceeded': True, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster,
+                                                     'lastLogin': last_login_time})
                     StoryObject.sprint_id = value
                     StoryObject.save()
 
@@ -133,12 +143,16 @@ def project(request):
 
 
         return render(request, 'project.html', context={'project': project, 'stories': stories, 'sprints': sprints,
-                               'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts, 'ended_sprints': ended_sprints, "completed_storyes":completed_storyes})
+                               'activate_home':'active', 'velocityLeft': velocityLeft, 'velocityExceeded': False, 'notProductOwner': notProductOwner, 'isScrumMaster':isScrumMaster, 'posts':posts, 'ended_sprints': ended_sprints, "completed_storyes":completed_storyes,
+                                                     'lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login')
 
 def story(request):
     if request.user.is_authenticated:
+        usr = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(usr)
+        
         user_is_product_owner = False
         story_id = request.GET.get('id')
         story = Story.objects.get(id=story_id)
@@ -163,7 +177,7 @@ def story(request):
         if request.user == product_owner:
             user_is_product_owner = True
         zipped = zip(tasks, times)
-        return render(request,'story.html', context={'story': story, 'tasks': tasks, 'sprint_active': sprint_active, 'user_is_product_owner': user_is_product_owner, 'tasks_times': zipped})
+        return render(request,'story.html', context={'story': story, 'tasks': tasks, 'sprint_active': sprint_active, 'user_is_product_owner': user_is_product_owner, 'tasks_times': zipped, 'lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login')
 
@@ -171,6 +185,7 @@ def new_story_form(request):
 
     if request.user.is_authenticated:
         user = user = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(user)
         projects = Project.objects.filter(Q(product_owner=user) | Q(scrum_master=user))
         success = False
         name_exists = False
@@ -205,6 +220,7 @@ def new_story_form(request):
                                 'success': success,
                                 # 'sprints': sprints,
                                 'name_exists':name_exists
+                                , 'lastLogin': last_login_time
                                 })
     else:
         return HttpResponseRedirect('/login')
@@ -262,6 +278,8 @@ def new_project_form(request):
         success = False
         name_exists = False
         dev_and_product_own = False
+        usr = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(usr)
         if request.method == 'POST':
             project_name =request.POST["project_name"]
             product_owner = request.POST["product_owner"]
@@ -290,14 +308,16 @@ def new_project_form(request):
                                 'users':users,
                                 'success': success,
                                 'name_exists':name_exists,
-                                'dev_and_product_own':dev_and_product_own
+                                'dev_and_product_own':dev_and_product_own,
+                                'lastLogin': last_login_time
                                 })
     else:
         return HttpResponseRedirect('/login')
 
 def new_task_form(request):
     if request.user.is_authenticated:
-  
+        user = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(user)
         if request.method == 'POST':
             story_id = request.POST["story"]
             story = Story.objects.get(id=story_id)
@@ -318,7 +338,7 @@ def new_task_form(request):
             project = story.project
             sprint = story.sprint
             dev_team_members = DevTeamMember.objects.filter(projectId=project)
-            return render(request, "new_task.html", context={'users':dev_team_members, 'story':story })
+            return render(request, "new_task.html", context={'users':dev_team_members, 'story':story,'lastLogin': last_login_time })
     else:
         return HttpResponseRedirect('/login')
         
@@ -362,6 +382,7 @@ def new_sprint_form(request):
         minStartDate = datetime.date.today().strftime("%Y-%m-%d")
 
         user = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(user)
         projects = Project.objects.filter(scrum_master=user)
 
         if request.method == 'POST':
@@ -386,7 +407,8 @@ def new_sprint_form(request):
                                                                     'success': success,
                                                                     'projectField': project_id,
                                                                     'activate_newsprint': 'active',
-                                                                    'speedField': speed})
+                                                                    'speedField': speed,
+                                                                    'lastLogin': last_login_time})
                 if start > end:
                     startBigger = True
                     return render(request, 'new_sprint.html', context={'projects': projects,
@@ -397,7 +419,8 @@ def new_sprint_form(request):
                                                                     'success': success,
                                                                     'projectField': project_id,
                                                                     'activate_newsprint': 'active',
-                                                                    'speedField': speed})
+                                                                    'speedField': speed,
+                                                                    'lastLogin': last_login_time})
 
 
             # add sprint
@@ -412,7 +435,8 @@ def new_sprint_form(request):
                                                         'minStartDate': minStartDate,
                                                         'minEndDate': minEndDate,
                                                         'activate_newsprint': 'active',
-                                                        'success': success})
+                                                        'success': success,
+                                                        'lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login')
 
@@ -421,14 +445,24 @@ def new_sprint_form(request):
 def my_tasks(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id)
-
+        last_login_time = get_last_login(user)
         today = datetime.date.today()
         current_sprint = Sprint.objects.filter(Q(start__lte=today)&Q(end__gte=today)).first()
         projects = {Project.objects.get(id=devTeamMember.projectId_id) for devTeamMember in DevTeamMember.objects.filter(userId_id=user)}
 
         return render(request, 'my_tasks.html', context={'projects': projects,
                                                          'activate_mytasks': 'active',
-                                                         'current_sprint': current_sprint})
+                                                         'current_sprint': current_sprint,
+                                                         'lastLogin': last_login_time})
+    else:
+        return HttpResponseRedirect('/login')
+
+def work_log(request):
+    if request.user.is_authenticated:
+        user = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(user)
+        tasks = Task.objects.filter(assignedUser=user)
+        return render(request, 'work_log.html', context={'tasks':tasks,'activate_work_log': 'active','lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login')
 
@@ -484,6 +518,7 @@ def new_post_form(request):
 def user_settings(request):
     if request.user.is_authenticated:
         user = get_user_model().objects.get(id=request.user.id) 
+        last_login_time = get_last_login(user)
         success = False
         username_exists = False
         email_exists = False
@@ -494,10 +529,10 @@ def user_settings(request):
             email = request.POST['email']
             if user.username != username and User.objects.filter(username=username):
                 username_exists = True
-                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "username_exists":username_exists})
+                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "username_exists":username_exists,'lastLogin': last_login_time})
             elif user.email != email and User.objects.filter(email=email):
                 email_exists = True
-                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "email_exists":email_exists})
+                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "email_exists":email_exists,'lastLogin': last_login_time})
             else:
                 user.username = username
                 user.first_name = firstname
@@ -505,13 +540,13 @@ def user_settings(request):
                 user.email = email
                 user.save()
                 success = True
-                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "success":success})
+                return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email, "success":success,'lastLogin': last_login_time})
         else:
             username = user.username
             firstname = user.first_name
             lastname = user.last_name
             email = user.email
-            return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email})
+            return render(request, "user_settings.html",context={"username":username,"first_name":firstname,"last_name":lastname,"email":email,'lastLogin': last_login_time})
     else:
        return HttpResponseRedirect('/login/') 
 
@@ -520,6 +555,8 @@ def user_settings(request):
 
 def change_password(request):
     if request.user.is_authenticated:
+        user = get_user_model().objects.get(id=request.user.id) 
+        last_login_time = get_last_login(user)
         if request.method == 'POST':
             form = PasswordChangeForm(request.user, request.POST)
             if form.is_valid():
@@ -527,13 +564,13 @@ def change_password(request):
                 update_session_auth_hash(request, user)  # Important!
                 messages.success(request, 'Your password was successfully updated!')
                 success = True
-                return render(request, 'change_password.html', {'form':form, 'success':success})
+                return render(request, 'change_password.html', {'form':form, 'success':success,'lastLogin': last_login_time})
             else:
                 messages.error(request, 'Please correct the error below.')
         else:
             form = PasswordChangeForm(request.user)
         return render(request, 'change_password.html', {
-            'form': form
+            'form': form,'lastLogin': last_login_time
         })
     else:
         return HttpResponseRedirect('/login/') 
@@ -711,6 +748,8 @@ class TaskUpdateView(BSModalUpdateView):
 
 def logTime(request):
     if request.user.is_authenticated:
+        usr = get_user_model().objects.get(id=request.user.id) 
+        last_login_time = get_last_login(usr)
         if request.method == 'POST':
             # updating time done on task from stopwatch
 
@@ -753,7 +792,7 @@ def logTime(request):
 
                 time.time_spent = hours + ':' + mins + ':' + secs
 
-            return render(request, "log_time.html", context={'workingOnSth': False, 'task': task, 'times': times, 'workDoneToday': 0, 'time': '00:00:00'})
+            return render(request, "log_time.html", context={'workingOnSth': False, 'task': task, 'times': times, 'workDoneToday': 0, 'time': '00:00:00','lastLogin': last_login_time})
         else:
             # check if there is work being done on some other task
             user = get_user_model().objects.get(id=request.user.id)
@@ -762,7 +801,7 @@ def logTime(request):
                 time_checkings = TimeSpent.objects.filter(task=tasks_checking)
                 for time_checking in time_checkings:
                     if time_checking.startedWorkingOn and not time_checking.task_id == int(request.GET.get('id')):
-                        return render(request, "log_time.html", context={'workingOnSth': True, 'workingOnTask': tasks_checking})
+                        return render(request, "log_time.html", context={'workingOnSth': True, 'workingOnTask': tasks_checking,'lastLogin': last_login_time})
 
             task = Task.objects.get(pk=request.GET.get('id'))
             times = TimeSpent.objects.filter(task=task)
@@ -817,7 +856,7 @@ def logTime(request):
 
                 time.time_spent = hours + ':' + mins + ':' + secs
 
-            return render(request, "log_time.html", context={'workingOnSth': False, 'task': task, 'times': times, 'workDoneToday': int(timeSpentWorking), 'time': timeDF})
+            return render(request, "log_time.html", context={'workingOnSth': False, 'task': task, 'times': times, 'workDoneToday': int(timeSpentWorking), 'time': timeDF,'lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login/')
 
@@ -843,10 +882,12 @@ def startWorkingOn(request):
 
 def sprints(request):
     if request.user.is_authenticated:
+        usr = get_user_model().objects.get(id=request.user.id) 
+        last_login_time = get_last_login(usr)
         project = Project.objects.get(pk=request.GET.get('id'))
         today = datetime.date.today()
         sprint = Sprint.objects.filter(project_id=request.GET.get('id')).filter(start__gte=today)
-        return render(request, "sprints.html", context={'project': project, 'sprints': sprint})
+        return render(request, "sprints.html", context={'project': project, 'sprints': sprint,'lastLogin': last_login_time})
 
     else:
         return HttpResponseRedirect('/login/')
@@ -863,6 +904,7 @@ def editSprint(request):
         minStartDate = datetime.date.today().strftime("%Y-%m-%d")
 
         user = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(user)
         projects = Project.objects.filter(scrum_master=user)
 
         if request.method == 'POST':
@@ -901,6 +943,7 @@ def editSprint(request):
                                                                             'today': today,
                                                                             'startDate': startDate,
                                                                             'stopDate': stopDate
+                                                                            ,'lastLogin': last_login_time
                                                                             })
                     if sprintEnd >= end and sprintStart <= end:
                         end_overlapping = True
@@ -919,6 +962,7 @@ def editSprint(request):
                                                                             'today': today,
                                                                             'startDate': startDate,
                                                                             'stopDate': stopDate
+                                                                            ,'lastLogin': last_login_time
                                                                             })
                     if start > end:
                         startBigger = True
@@ -935,7 +979,8 @@ def editSprint(request):
                                                                             'success': success,
                                                                             'today': today,
                                                                             'startDate': startDate,
-                                                                            'stopDate': stopDate
+                                                                            'stopDate': stopDate,
+                                                                            'lastLogin': last_login_time
                                                                             })
 
             # add sprint
@@ -969,7 +1014,8 @@ def editSprint(request):
                                                             'success': success,
                                                             'today': today,
                                                             'startDate': startDate,
-                                                            'stopDate': stopDate})
+                                                            'stopDate': stopDate,
+                                                            'lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login')
 
@@ -988,6 +1034,8 @@ def deleteSprint(request):
 
 def documentation(request):
     if request.user.is_authenticated:
+        user = get_user_model().objects.get(id=request.user.id)
+        last_login_time = get_last_login(user)
         if request.method == 'POST':
 
             form = DocumentationForm(request.POST)
@@ -1000,12 +1048,12 @@ def documentation(request):
                 project.save()
 
                 form = DocumentationForm(initial={'documentation': project.documentation})
-                return render(request, 'documentation.html', context={'form': form, 'project': project})
+                return render(request, 'documentation.html', context={'form': form, 'project': project,  'lastLogin': last_login_time})
 
         else:
             project = Project.objects.get(pk=request.GET.get('id'))
             form = DocumentationForm(initial={'documentation': project.documentation})
-            return render(request, 'documentation.html', context={'form': form, 'project': project})
+            return render(request, 'documentation.html', context={'form': form, 'project': project,  'lastLogin': last_login_time})
     else:
         return HttpResponseRedirect('/login')
 
