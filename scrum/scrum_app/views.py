@@ -72,8 +72,11 @@ def project(request):
         stories = Story.objects.filter(project=project).order_by(Lower('developmentStatus').desc())
 
         today = datetime.date.today()
+        yesterday = (datetime.date.today() - datetime.timedelta(days=1))
 
-        sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
+        # sprints = Sprint.objects.filter(project=project).filter(start__gte=today)
+
+        sprints = Sprint.objects.filter(project=project).filter(Q(start__lte=yesterday) | Q(end__gte=today))
 
         ended_sprints = Sprint.objects.filter(project=project).filter(end__lte=today)
 
