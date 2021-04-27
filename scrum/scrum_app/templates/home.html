@@ -14,10 +14,10 @@
 			<p style="margin-bottom: 15px;">Product owner: {{ project.product_owner }}</p>
 			<p style="margin-bottom: 15px;">Scrum master: {{ project.scrum_master }}</p>
 			{% if user.is_staff  or user.username == project.scrum_master.username %}
-				<a class="btn btn-primary" href="project/update_project/{{ project.id }}">Edit</a>
+				<a title="Edit project details" class="btn btn-primary" href="project/update_project/{{ project.id }}">Edit</a>
 			{% endif %}
-			<a class="btn btn-primary" href="project?id={{ project.id }}">Details</a>
-			<a class="btn btn-primary" href="project/documentation?id={{ project.id }}">Documentation</a>
+			<a title="View project details" class="btn btn-primary" href="project?id={{ project.id }}">Details</a>
+			<a title="View and edit project documentation" class="btn btn-primary" href="project/documentation?id={{ project.id }}">Documentation</a>
 		</div>
 	</div>
 	

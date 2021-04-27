@@ -65,21 +65,21 @@
 				<ul class="nav nav-pills flex-column">
 
 				 	<li class="nav-item">
-				    	<a class="nav-link {{ activate_home }}" href="/">Home</a>
+				    	<a title="Projects list" class="nav-link {{ activate_home }}" href="/">Home</a>
 				  	</li>
 					{% if user.is_staff %}
 				  	<li class="nav-item">
-				    	<a class="nav-link {{ activate_newproject }}" href="/new_project/">New project</a>
+				    	<a title="Create new project" class="nav-link {{ activate_newproject }}" href="/new_project/">New project</a>
 				  	</li>
 					{% endif %}
 				  	<li class="nav-item">
-				    	<a class="nav-link {{ activate_newsprint }}" href="/new_sprint/">New sprint</a>
+				    	<a title="Create new sprint" class="nav-link {{ activate_newsprint }}" href="/new_sprint/">New sprint</a>
 				  	</li>
 				  	<li class="nav-item">
-				    	<a class="nav-link {{ activate_newstory }}" href="/new_story/">New story</a>
+				    	<a title="Create new user story" class="nav-link {{ activate_newstory }}" href="/new_story/">New story</a>
 				  	</li>
 				  	<li class="nav-item">
-				    	<a class="nav-link {{ activate_mytasks }}" href="/my_tasks/">My tasks</a>
+				    	<a title="Tasks list" class="nav-link {{ activate_mytasks }}" href="/my_tasks/">My tasks</a>
 				  	</li>
 				</ul>
 			</nav>
