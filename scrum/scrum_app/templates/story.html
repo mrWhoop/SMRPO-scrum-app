@@ -152,6 +152,7 @@ $(document).ready(function() {
       <th scope="col" class="col-2 align-self-baseline">Time spent (h)</th>
       <th scope="col" class="col-2 align-self-baseline">Assigned to</th>
       <th scope="col" class="col-3">Confirmation status</th>
+      <th scope="col" class="col-2 align-self-baseline"><br>Active</th>
       <th scope="col" class="col-2 align-self-baseline"><br>Done</th>
       {% if user_is_product_owner == False %}
       <th scope="col" class="col-2 align-self-baseline"><br><br></th>
@@ -168,6 +169,13 @@ $(document).ready(function() {
           <td class="col-2">{{time}}</td>
           <td class="col-2">{{task.assignedUser}}</td>
           <td class="col-3">{{task.userConfirmed}}</td>
+          <td class="col-2">
+            {% if task.timeSpent|length > 0 and not task.done  %}
+              <i class="fas fa-check text-success"></i>
+            {% else %}
+              <i class="fas fa-times text-danger"></i>
+            {% endif %}
+          </td>
           <td class="col-2">
             {% if task.done %}
               <i class="fas fa-check text-success"></i>
