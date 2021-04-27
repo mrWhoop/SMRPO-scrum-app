@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^project/update_story/(?P<pk>\d+)/$', views.StoryUpdateView.as_view(), name='update_story'),
     url(r'^project/story/new_task/$', views.new_task_form, name='new_task_form'),
     url(r'^my_tasks/$', views.my_tasks, name='my_tasks'),
+    url(r'^work_log/$', views.work_log, name='work_log'),
     url(r'^task/$', views.logTime, name='log_time'),
     url(r'^sprints/$', views.sprints, name='sprints'),
     url(r'^sprints/editSprint$', views.editSprint, name='edit_sprint'),
