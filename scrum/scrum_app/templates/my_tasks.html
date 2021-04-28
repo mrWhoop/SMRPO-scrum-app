@@ -21,7 +21,7 @@
 		    			<div class="card-body">
 			    				{% for task in story.tasks %}
 
-			    				{% if user.id == task.assignedUser_id or task.userConfirmed == 'free' or task.userConfirmed == 'rejected' or task.userConfirmed == 'pending' %}
+			    				{% if user.id == task.assignedUser_id or task.userConfirmed == 'free' or task.userConfirmed == 'rejected' or task.userConfirmed == 'pending' and user.id == task.assignedUser_id %}
 
 				    				<div class="card">
 						    			<div class="card-body">
