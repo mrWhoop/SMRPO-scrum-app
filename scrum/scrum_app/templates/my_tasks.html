@@ -43,20 +43,27 @@
 						    					<div class="btns_{{task.id}} col {% if task.done %} d-none {% endif %}">
 						    						<div class="row">
 								    					<div class="col mt-2">
-								    						<div title="This task is accepted" style="cursor: initial;" data-value="{{ task.id }}" class="task_{{ task.id }} text-success btn {% if user.id != task.assignedUser_id or task.userConfirmed == 'pending' %} d-none {% endif %}">Accepted</div>
-								    						<div title="Accept task" data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-success {% if task.userConfirmed == 'accepted' %} d-none {% endif %}">Accept</div>
+
+								    						<div title="This task is accepted or assigned" style="cursor: initial;" data-value="{{ task.id }}" class="task_{{ task.id }} text-success btn {% if task.userConfirmed != 'accepted' and task.userConfirmed != 'pending' %} d-none {% endif %}">
+								    							{% if task.userConfirmed == 'pending' %}
+								    								Assigned
+								    							{% else %}
+								    								Accepted
+								    							{% endif %}
+								    						</div>
+								    						<div title="Accept task" data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-success {% if task.userConfirmed == 'accepted' or task.userConfirmed == 'pending' %} d-none {% endif %}">Accept</div>
 								    					</div>
 								    					<div class="col mt-2">
-															<div title="Reject task" data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if task.userConfirmed == 'free' or task.userConfirmed == 'rejected'  or task.userConfirmed != 'accepted' %} d-none {% endif %}">Reject</div>
+															<div title="Reject task" data-value="{{ task.id }}" class="task_{{ task.id }} btn_click btn btn-danger {% if task.userConfirmed != 'accepted' and task.userConfirmed != 'pending' %} d-none {% endif %}">Reject</div>
 								    					</div>
 							    					</div>
 						    						<div class="col pt-3">
-								    					<a title="Accept task" class="btn btn-primary mt-1 task_{{ task.id }} {% if task.userConfirmed != 'accepted' %} d-none {% endif %}" href="/task?id={{ task.id }}">Do some work</a>
+								    					<a title="Accept task" class="btn btn-primary mt-1 task_{{ task.id }} {% if task.userConfirmed != 'accepted' and task.userConfirmed != 'pending' %} d-none {% endif %}" href="/task?id={{ task.id }}">Do some work</a>
 								    				</div>
 							    				</div>
 						    					<div class="mt-2">
 						    						{% if story.sprint_id == current_sprint.id %}
-									                <div class="done_{{task.id}} form-check form-switch mt-2 {% if task.userConfirmed != 'accepted' and task.assignedUser_id != user.id %} d-none {% endif %}">
+									                <div class="done_{{task.id}} form-check form-switch mt-2 {% if task.userConfirmed != 'accepted' and task.userConfirmed != 'pending' %} d-none {% endif %}">
 									                  <input title="Mark as done" class="form-check-input checkbox_click" data-value="{{ task.id }}" type="checkbox" id="flexSwitchCheckDefault" name="done" {% if task.done %}checked{% endif %}>
 									                  <label class="form-check-label" for="flexSwitchCheckDefault">Done</label>
 									                </div>
@@ -89,6 +96,8 @@
 
 		var task_id = $(this).data("value");
 		var userConfirmed = $(this).text();
+		var was = $().text();
+
 
 		$.ajax({
 			type: "POST",
@@ -99,6 +108,7 @@
 			$(".task_"+result).toggleClass("d-none");
 			$(".done_"+result).toggleClass("d-none");
 			if (userConfirmed == "Reject") {
+
 				$(".done_"+result).addClass("d-none");
 			}
 		});
